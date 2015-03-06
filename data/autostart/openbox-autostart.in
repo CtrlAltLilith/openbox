@@ -12,6 +12,9 @@ fi
 test -z $BG || $BG -solid "#303030"
 
 GLOBALAUTOSTART="@rcdir@/autostart"
+if [ "x$XDG_CONFIG_DIRS" != "x" ]; then
+	GLOBALAUTOSTART="$XDG_CONFIG_DIRS/openbox/autostart"
+fi
 AUTOSTART="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/autostart"
 
 # Run the global openbox autostart script

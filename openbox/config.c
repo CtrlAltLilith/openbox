@@ -110,6 +110,7 @@ ObAppSettings* config_create_app_settings(void)
 {
     ObAppSettings *settings = g_slice_new0(ObAppSettings);
     settings->type = -1;
+    settings->set_type = -1;
     settings->decor = -1;
     settings->shade = -1;
     settings->monitor_type = OB_PLACE_MONITOR_ANY;
@@ -135,6 +136,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     g_assert(dst != NULL);
 
     copy_if(type, (ObClientType)-1);
+    copy_if(set_type, -1);
     copy_if(decor, -1);
     copy_if(shade, -1);
     copy_if(monitor_type, OB_PLACE_MONITOR_ANY);
@@ -252,6 +254,19 @@ static void parse_single_per_app_settings(xmlNodePtr app,
         }
 
         obt_xml_attr_bool(n, "force", &settings->pos_force);
+    }
+
+    if ((n = obt_xml_find_node(app->children, "set_window_property"))) {
+	    if ((c = obt_xml_find_node(n->children, "type"))) {
+	        gchar *s = obt_xml_node_string(c);
+	        if (!g_ascii_strcasecmp(s, "desktop"))
+                settings->set_type = OB_CLIENT_TYPE_DESKTOP;
+ 	        else if (!g_ascii_strcasecmp(s, "dock"))
+                settings->set_type = OB_CLIENT_TYPE_DOCK;
+ 	        else if (!g_ascii_strcasecmp(s, "override"))
+                settings->set_type = OB_CLIENT_TYPE_OVERRIDE;
+            g_free(s);
+	    }
     }
 
     if ((n = obt_xml_find_node(app->children, "size"))) {

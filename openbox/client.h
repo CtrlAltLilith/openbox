@@ -51,7 +51,8 @@ typedef enum
     OB_CLIENT_TYPE_UTILITY, /*!< A small utility window such as a palette */
     OB_CLIENT_TYPE_SPLASH,  /*!< A splash screen window */
     OB_CLIENT_TYPE_DIALOG,  /*!< A dialog window */
-    OB_CLIENT_TYPE_NORMAL   /*!< A normal application window */
+    OB_CLIENT_TYPE_NORMAL,  /*!< A normal application window */
+    OB_CLIENT_TYPE_OVERRIDE /*!< A window not subject to our management */
 } ObClientType;
 
 /*! The things the user can do to the client window */

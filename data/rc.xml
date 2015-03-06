@@ -734,6 +734,12 @@
 
     <maximized>true</maximized>
     # 'Horizontal', 'Vertical' or boolean (yes/no)
+    
+	<set_window_property>
+	# set a particular window property
+		<type>desktop</type>
+		# window type, currently supported: 'desktop','dock'
+	</set_window_property>
   </application>
 
   # end of the example
