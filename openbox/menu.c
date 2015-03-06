@@ -55,6 +55,7 @@ static void menu_destroy_hash_value(ObMenu *self);
 static void parse_menu_item(xmlNodePtr node, gpointer data);
 static void parse_menu_separator(xmlNodePtr node, gpointer data);
 static void parse_menu(xmlNodePtr node, gpointer data);
+static gboolean is_valid_shortcut(gchar *c);
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gchar **strippedlabel, guint *position,
                                gboolean *always_show);
@@ -201,6 +202,19 @@ static ObMenu* menu_from_name(gchar *name)
                            ((c) >= 'A' && (c) <= 'Z') || \
                            ((c) >= 'a' && (c) <= 'z'))
 
+static gboolean is_valid_shortcut(gchar *c)
+{
+    gunichar uc;
+
+    if(!config_menu_utf8_enabled)   // unless utf8 support is explicitly enabled in config
+        return VALID_SHORTCUT(*c);  // preserve old behaviour
+
+    uc = g_utf8_get_char_validated(c, MAX(OB_MAX_UTF8_CHAR_SZ, strlen(c)));
+    g_assert(uc > ((gunichar) - 1));
+
+    return config_menu_utf8_allow_graph ? g_unichar_isgraph(uc) : g_unichar_isalnum(uc); 
+}
+
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gchar **strippedlabel, guint *position,
                                gboolean *always_show)
@@ -228,7 +242,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
         i = *strippedlabel;
         do {
             escape = FALSE;
-            i = strchr(i, '_');
+            i = config_menu_utf8_enabled ? g_utf8_strchr(i, -1, '_') : strchr(i, '_');
             if (i && *(i+1) == '_') {
                 gchar *j;
 
@@ -244,10 +258,16 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
         if (allow_shortcut && i != NULL) {
             /* there is an underscore in the string */
 
-            /* you have to use a printable ascii character for shortcuts
+            /* without utf8Enabled:
+                you have to use an alphanumeric ascii character for shortcuts
+
+               with utf8Enabled:
+                iff not utf8AllowGraph, you have to use an alphanumeric utf8 character
+                else any graph will do (printable character excluding whitespace/formatting
+
                don't allow space either, so you can have like "a _ b"
             */
-            if (VALID_SHORTCUT(*(i+1))) {
+            if (is_valid_shortcut(i+1)) {
                 shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
                 *position = i - *strippedlabel;
                 *always_show = TRUE;
@@ -267,7 +287,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                instead */
 
             for (i = *strippedlabel; *i != '\0'; ++i)
-                if (VALID_SHORTCUT(*i)) {
+                if (is_valid_shortcut(i)) {
                     *position = i - *strippedlabel;
                     shortcut = g_unichar_tolower(g_utf8_get_char(i));
                     break;

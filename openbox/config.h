@@ -210,6 +210,10 @@ extern guint    config_submenu_show_delay;
 extern guint    config_submenu_hide_delay;
 /*! Show manage desktops in client_list_menu */
 extern gboolean config_menu_manage_desktops;
+/*! Enable utf8 support in menus */
+extern gboolean config_menu_utf8_enabled;
+/*! Allow using all graphs as menu shortcuts */
+extern gboolean config_menu_utf8_allow_graph;
 /*! Load & show icons in user-defined menus */
 extern gboolean config_menu_show_icons;
 /*! User-specified menu files */

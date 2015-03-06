@@ -19,6 +19,9 @@
 #ifndef __ob__misc_h
 #define __ob__misc_h
 
+
+#define OB_MAX_UTF8_CHAR_SZ 4
+
 /*! The alpha value to use for icons of iconified windows in various places
   like the focus cycle popup and client list menus.
   Give iconic windows 7/16 alpha. A little under 50%.

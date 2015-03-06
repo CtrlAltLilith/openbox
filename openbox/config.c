@@ -98,6 +98,8 @@ guint    config_submenu_show_delay;
 guint    config_submenu_hide_delay;
 gboolean config_menu_manage_desktops;
 gboolean config_menu_show_icons;
+gboolean config_menu_utf8_enabled;
+gboolean config_menu_utf8_allow_graph;
 
 GSList *config_menu_files;
 
@@ -964,8 +966,13 @@ static void parse_menu(xmlNodePtr node, gpointer d)
         config_submenu_hide_delay = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "manageDesktops")))
         config_menu_manage_desktops = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "utf8Enabled"))) 
+        config_menu_utf8_enabled = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "utf8AllowGraph"))) 
+        config_menu_utf8_allow_graph = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "showIcons"))) {
         config_menu_show_icons = obt_xml_node_bool(n);
+
 #if !defined(USE_IMLIB2) && !defined(USE_LIBRSVG)
         if (config_menu_show_icons)
             g_message(_("Openbox was compiled without image loading support. Icons in menus will not be loaded."));
@@ -1180,6 +1187,8 @@ void config_startup(ObtXmlInst *i)
     config_submenu_show_delay = 100;
     config_submenu_hide_delay = 400;
     config_menu_manage_desktops = TRUE;
+    config_menu_utf8_enabled = FALSE;
+    config_menu_utf8_allow_graph = FALSE;
     config_menu_files = NULL;
     config_menu_show_icons = TRUE;
 
