@@ -647,6 +647,14 @@
        entry in parent menu
        if this is a negative value, then the delay is infinite and the
        submenu will not be hidden until a different submenu is opened -->
+  <utf8Enabled>no</utf8Enabled>
+  <!-- set to 'yes' to enable utf8 (unicode) support for menu shortcuts
+       this includes automatic selection of first suitable character and
+       manual setting with a prepended underscore -->
+  <utf8AllowGraph>no</utf8AllowGraph>
+  <!-- set to 'yes' (utf8Enabled must also be set to 'yes') to allow the use of
+       any printable utf8 (unicode) character as a menu shortcut
+       by default ('no'), shortcuts are restricted to alphanumeric characters -->
   <showIcons>yes</showIcons>
   <!-- controls if icons appear in the client-list-(combined-)menu -->
   <manageDesktops>yes</manageDesktops>

@@ -224,6 +224,8 @@
             <xsd:element maxOccurs="unbounded" name="file" type="xsd:string"/>
             <xsd:element minOccurs="0" name="hideDelay" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="middle" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="utf8Enabled" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="utf8AllowGraph" type="ob:bool"/>
             <xsd:element minOccurs="0" name="submenuShowDelay" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="showIcons" type="ob:bool"/>
             <xsd:element minOccurs="0" name="manageDesktops" type="ob:bool"/>
