@@ -362,8 +362,10 @@ gboolean focus_valid_target(ObClient *ft,
        or if the window is iconified (and does not have any parents with
        which to uniconify it), and it is not used for windows which are
        hilited, or dialog windows as these need user interaction and should
-       not be long-lasting windows */
-    ok = ok && (!ft->skip_taskbar ||
+       not be long-lasting windows 
+       bug #6362: desktop window may be set to skip the taskbar - they usually are
+    */
+    ok = ok && ((!ft->skip_taskbar || ft->type == OB_CLIENT_TYPE_DESKTOP) ||
                 (ft->modal || user_request ||
                  (ft->iconic && !ft->parents) ||
                  ft->demands_attention ||
