@@ -32,7 +32,6 @@
 #  include <unistd.h>
 #endif
 
-static gboolean  enabled_types[OB_DEBUG_TYPE_NUM] = {FALSE};
 static FILE     *log_file = NULL;
 static guint     rr_handler_id = 0;
 static guint     obt_handler_id = 0;
@@ -48,6 +47,9 @@ static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
 
 void ob_debug_startup(void)
 {
+    if(log_file)
+        return;
+
     ObtPaths *p = obt_paths_new();
     gchar *dir = g_build_filename(obt_paths_cache_home(p),
                                   "openbox", NULL);
@@ -93,12 +95,6 @@ void ob_debug_shutdown(void)
         fclose(log_file);
         log_file = NULL;
     }
-}
-
-void ob_debug_enable(ObDebugType type, gboolean enable)
-{
-    g_assert(type < OB_DEBUG_TYPE_NUM);
-    enabled_types[type] = enable;
 }
 
 static inline void log_print(FILE *out, const gchar* log_domain,
@@ -148,8 +144,10 @@ static inline void log_argv(ObDebugType type,
     const gchar *prefix;
     gchar *message;
 
-    g_assert(type < OB_DEBUG_TYPE_NUM);
-    if (!enabled_types[type]) return;
+    if (! (ob_debug_mode & type)) return;
+    
+    if(!log_file)
+        ob_debug_startup();
 
     switch (type) {
     case OB_DEBUG_FOCUS:    prefix = "(FOCUS) ";           break;

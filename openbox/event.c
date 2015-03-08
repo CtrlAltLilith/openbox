@@ -782,13 +782,17 @@ static void event_handle_root(XEvent *e)
                 show_mode = SCREEN_SHOW_DESKTOP_NO;
             screen_show_desktop(show_mode, NULL);
         } else if (msgtype == OBT_PROP_ATOM(OB_CONTROL)) {
-            ob_debug("OB_CONTROL: %d", e->xclient.data.l[0]);
-            if (e->xclient.data.l[0] == 1)
+            ob_debug("received OB_CONTROL: %d", e->xclient.data.l[0]);
+            if (e->xclient.data.l[0] & OB_REMOTECTRL_CMD_RECONFIG)
                 ob_reconfigure();
-            else if (e->xclient.data.l[0] == 2)
+            else if (e->xclient.data.l[0] & OB_REMOTECTRL_CMD_RESTART)
                 ob_restart();
-            else if (e->xclient.data.l[0] == 3)
+            else if (e->xclient.data.l[0] & OB_REMOTECTRL_CMD_EXIT)
                 ob_exit(0);
+            else if (e->xclient.data.l[0] & OB_REMOTECTRL_CMD_DEBUGMOD) {
+                ob_debug_mode = e->xclient.data.l[0] >> OB_REMOTECTRL_CMD_BITLEN; // set debug mode with the data supplied
+                ob_debug("debug mode set to %d", ob_debug_mode);
+            }
         } else if (msgtype == OBT_PROP_ATOM(WM_PROTOCOLS)) {
             if ((Atom)e->xclient.data.l[0] == OBT_PROP_ATOM(NET_WM_PING))
                 ping_got_pong(e->xclient.data.l[1]);
