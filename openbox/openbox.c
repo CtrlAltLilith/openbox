@@ -103,7 +103,8 @@ static gboolean  restart = FALSE;
 static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
 static gint      exitcode = 0;
-static guint     remote_control = 0;
+static guint     remote_control_cmd = 0;
+       guint     ob_debug_mode = 0;
 static gboolean  being_replaced = FALSE;
 static gchar    *config_file = NULL;
 static gchar    *startup_cmd = NULL;
@@ -152,8 +153,6 @@ gint main(gint argc, gchar **argv)
 
     ob_set_state(OB_STATE_STARTING);
 
-    ob_debug_startup();
-
     /* initialize the locale */
     if (!(ob_locale_msg = setlocale(LC_MESSAGES, "")))
         g_message("Couldn't set messages locale category from environment.");
@@ -166,7 +165,7 @@ gint main(gint argc, gchar **argv)
     if (chdir(g_get_home_dir()) == -1)
         g_message(_("Unable to change to home directory \"%s\": %s"),
                   g_get_home_dir(), g_strerror(errno));
-
+    
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
     /* parse the environment variables */
@@ -175,21 +174,31 @@ gint main(gint argc, gchar **argv)
     program_name = g_path_get_basename(argv[0]);
     g_set_prgname(program_name);
 
-    if (!remote_control)
+    if (!remote_control_cmd)
         session_startup(argc, argv);
 
     if (!obt_display_open(NULL))
         ob_exit_with_error(_("Failed to open the display from the DISPLAY environment variable."));
 
-    if (remote_control) {
+    if (remote_control_cmd) {
         /* Send client message telling the OB process to:
-         * remote_control = 1 -> reconfigure
-         * remote_control = 2 -> restart */
+         * remote_control_cmd & OB_REMOTECTRL_CMD_RECONFIG -> reconfigure
+         * remote_control_cmd & OB_REMOTECTRL_CMD_RESTART  -> restart
+         * remote_control_cmd & OB_REMOTECTRL_CMD_EXIT     -> exit
+         * remote_control_cmd & OB_REMOTECTRL_CMD_DEBUGMOD -> modify enabled debugmodes
+        */
+
+        if(remote_control_cmd & OB_REMOTECTRL_CMD_DEBUGMOD)
+            remote_control_cmd |= ob_debug_mode << OB_REMOTECTRL_CMD_BITLEN; // send debug mode as control data 
+
+
         OBT_PROP_MSG(ob_screen, obt_root(ob_screen),
-                     OB_CONTROL, remote_control, 0, 0, 0, 0);
+                     OB_CONTROL, remote_control_cmd, 0, 0, 0, 0);
         obt_display_close();
         exit(EXIT_SUCCESS);
     }
+
+    ob_debug_startup();
 
     ob_main_loop = g_main_loop_new(NULL, FALSE);
 
@@ -683,26 +692,32 @@ static void parse_args(gint *argc, gchar **argv)
             }
         }
         else if (!strcmp(argv[i], "--debug")) {
-            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
-            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
+            ob_debug_mode = ob_debug_mode | OB_DEBUG_NORMAL | OB_DEBUG_APP_BUGS;
         }
         else if (!strcmp(argv[i], "--debug-focus")) {
-            ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
+            ob_debug_mode |= OB_DEBUG_FOCUS;
         }
         else if (!strcmp(argv[i], "--debug-session")) {
-            ob_debug_enable(OB_DEBUG_SM, TRUE);
+            ob_debug_mode |= OB_DEBUG_SM;
         }
         else if (!strcmp(argv[i], "--debug-xinerama")) {
             ob_debug_xinerama = TRUE;
         }
+        else if (!strcmp(argv[i], "--debug-all")) {
+            ob_debug_mode |= OB_DEBUG_ALL;
+            ob_debug_xinerama = TRUE;
+        }
+        else if (!strcmp(argv[i], "--debug-modify")) {
+            remote_control_cmd |= OB_REMOTECTRL_CMD_DEBUGMOD;
+        }
         else if (!strcmp(argv[i], "--reconfigure")) {
-            remote_control = 1;
+            remote_control_cmd |= OB_REMOTECTRL_CMD_RECONFIG;
         }
         else if (!strcmp(argv[i], "--restart")) {
-            remote_control = 2;
+            remote_control_cmd |= OB_REMOTECTRL_CMD_RESTART;
         }
         else if (!strcmp(argv[i], "--exit")) {
-            remote_control = 3;
+            remote_control_cmd |= OB_REMOTECTRL_CMD_EXIT;
         }
         else if (!strcmp(argv[i], "--config-file")) {
             if (i == *argc - 1) /* no args left */

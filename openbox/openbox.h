@@ -63,4 +63,18 @@ void ob_exit_with_error(const gchar *msg) G_GNUC_NORETURN;
 
 Cursor ob_cursor(ObCursor cursor);
 
+typedef enum
+{
+    OB_REMOTECTRL_CMD_RECONFIG      =   1 << 0, // reload configs
+    OB_REMOTECTRL_CMD_RESTART       =   1 << 1, // restart openbox
+    OB_REMOTECTRL_CMD_EXIT          =   1 << 2, // exit openbox
+    OB_REMOTECTRL_CMD_DEBUGMOD      =   1 << 3, // change enabled debugmodes 
+    OB_REMOTECTRL_CMD_RESERVED5     =   1 << 4, // reserved for future use
+    OB_REMOTECTRL_CMD_RESERVED6     =   1 << 5, // reserved for future use
+    OB_REMOTECTRL_CMD_RESERVED7     =   1 << 6, // reserved for future use
+    OB_REMOTECTRL_CMD_RESERVED8     =   1 << 7  // reserved for future use
+} ObRemoteControlCmds;
+
+#define OB_REMOTECTRL_CMD_BITLEN    8
+
 #endif
