@@ -3213,6 +3213,9 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *w -= self->base_size.width;
         *h -= self->base_size.height;
 
+        *w += self->base_size.width;
+        *h += self->base_size.height;
+
         if (minratio)
             if (*h * minratio > *w) {
                 *h = (gint)(*w / minratio);
@@ -3233,9 +3236,6 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                     *w = (gint)(*h * minratio);
                 }
             }
-
-        *w += self->base_size.width;
-        *h += self->base_size.height;
     }
 
     /* these override the above states! if you cant move you can't move! */
