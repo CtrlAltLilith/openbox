@@ -265,8 +265,6 @@ static void parse_single_per_app_settings(xmlNodePtr app,
                 settings->set_type = OB_CLIENT_TYPE_DESKTOP;
  	        else if (!g_ascii_strcasecmp(s, "dock"))
                 settings->set_type = OB_CLIENT_TYPE_DOCK;
- 	        else if (!g_ascii_strcasecmp(s, "override"))
-                settings->set_type = OB_CLIENT_TYPE_OVERRIDE;
             g_free(s);
 	    }
     }

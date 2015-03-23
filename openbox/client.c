@@ -115,9 +115,6 @@ static gboolean client_can_steal_focus(ObClient *self,
 static void client_setup_default_decor_and_functions(ObClient *self);
 static void client_setup_decor_undecorated(ObClient *self);
 
-static Atom client_type_to_wmtype(ObClientType type);
-static gboolean client_set_type(ObClient *self, gulong type);
-
 
 void client_startup(gboolean reconfig)
 {
@@ -916,12 +913,7 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
 
     settings = config_create_app_settings();
 
-
-    ob_debug("APPSET_MATCH: attempting to match window %s", self->name);
-
-
-    int rule_no = 0;
-    for (it = config_per_app_settings; it; it = g_slist_next(it), rule_no++) {
+    for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *app = it->data;
         gboolean match = TRUE;
 
@@ -930,60 +922,35 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
                  app->group_name != NULL || app->group_class != NULL ||
                  (signed)app->type >= 0);
 
-        ob_debug("APPSET_MATCH: trying rule %d", rule_no);
-
 
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on name");
-        }
         else if (app->group_name &&
             !g_pattern_match(app->group_name,
                              strlen(self->group_name), self->group_name, NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on group_name");
-        }
         else if (app->class &&
                  !g_pattern_match(app->class,
                                   strlen(self->class), self->class, NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on class");
-        }
         else if (app->group_class &&
                  !g_pattern_match(app->group_class,
                                   strlen(self->group_class), self->group_class,
                                   NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on group_class");
-        }
         else if (app->role &&
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on role");
-        }
         else if (app->title &&
                  !g_pattern_match(app->title,
                                   strlen(self->title), self->title, NULL))
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on title");
-        }
         else if ((signed)app->type >= 0 && app->type != self->type) 
-        {
             match = FALSE;
-            ob_debug("APPSET_MATCH: failed match on type");
-        }
 
         if (match) {
-            ob_debug("APPSET_MATCH: Window matching: %s", self->name);
-
             /* copy the settings to our struct, overriding the existing
                settings if they are not defaults */
             config_app_settings_copy_non_defaults(app, settings);
@@ -991,13 +958,8 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
     }
 
 
-    if (settings->set_type != -1) {
+    if (settings->set_type != -1) 
         self->type = settings->set_type;
-        if (client_set_type(self, client_type_to_wmtype(settings->set_type)))
-            ob_debug("Setting window type (for %s) to: %u", self->name, self->type);
-        else
-            ob_debug("Failed to set window type (for %s)", self->name);
-    }
     if (settings->shade != -1)
         self->shaded = !!settings->shade;
     if (settings->decor != -1)
@@ -1605,29 +1567,6 @@ void client_get_mwm_hints(ObClient *self)
     }
 }
 
-static gboolean client_set_type(ObClient *self, gulong type)
-{
-    guint num, i;
-    guint32 *orig_val;
-    gulong  *set_val;
-
-    if (OBT_PROP_GETA32(self->window, NET_WM_WINDOW_TYPE, ATOM, &orig_val, &num)) {
-        set_val = g_slice_alloc((num + 1) * sizeof(gulong));
-
-        set_val[0] = type;
-        for (i = 1; i <= num; i++)
-            set_val[i] = orig_val[i];
-
-        OBT_PROP_SETA32(self->window, NET_WM_WINDOW_TYPE, ATOM, set_val, num);
-        
-        g_slice_free1((num + 1) * sizeof(gulong), set_val);
-
-        return TRUE;
-    }
-
-    return FALSE;
-}
-    
 
 void client_get_type_and_transientness(ObClient *self)
 {
@@ -2520,34 +2459,6 @@ static void client_get_session_ids(ObClient *self)
         if (OBT_PROP_GET32(self->window, NET_WM_PID, CARDINAL, &pid))
             self->pid = pid;
     }
-}
-
-static Atom client_type_to_wmtype(ObClientType type)
-{
-    gulong wmtype;
-
-    switch (type) {
-        case OB_CLIENT_TYPE_NORMAL:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_NORMAL); break;
-        case OB_CLIENT_TYPE_DIALOG:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG); break;
-        case OB_CLIENT_TYPE_UTILITY:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_UTILITY); break;
-        case OB_CLIENT_TYPE_MENU:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_MENU); break;
-        case OB_CLIENT_TYPE_TOOLBAR:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_TOOLBAR); break;
-        case OB_CLIENT_TYPE_SPLASH:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_SPLASH); break;
-        case OB_CLIENT_TYPE_DESKTOP:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DESKTOP); break;
-        case OB_CLIENT_TYPE_DOCK:
-            wmtype = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK); break;
-        case OB_CLIENT_TYPE_OVERRIDE:
-            wmtype = OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE); break;
-    }
-
-    return wmtype;
 }
 
 const gchar *client_type_to_string(ObClient *self)

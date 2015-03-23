@@ -237,6 +237,11 @@
         </xsd:all>
         <xsd:attribute name="force" type="ob:bool"/>
     </xsd:complexType>
+    <xsd:complexType name="window_type">
+        <xsd:all>
+            <xsd:element name="type" type="ob:clienttype"/>
+        </xsd:all>
+    </xsd:complexType>
     <xsd:complexType name="window_size">
         <xsd:all>
             <xsd:element name="width" type="ob:size_value"/>
@@ -257,6 +262,7 @@
             <xsd:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
             <xsd:element minOccurs="0" name="fullscreen" type="ob:bool"/>
             <xsd:element minOccurs="0" name="maximized" type="ob:maximization"/>
+            <xsd:element minOccurs="0" name="set_window_type" type="ob:window_type"/>
         </xsd:all>
         <!-- at least one of these must be present -->
         <xsd:attribute name="role" type="xsd:string"/>
