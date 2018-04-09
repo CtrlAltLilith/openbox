@@ -156,6 +156,9 @@ extern gchar *config_title_layout;
 extern gboolean config_animate_iconify;
 /*! Size of icons in focus switching dialogs */
 extern guint config_theme_window_list_icon_size;
+/*! Display rounded corners for decorated windows */
+extern guint config_theme_cornerradius;
+extern gboolean config_theme_menuradius;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;

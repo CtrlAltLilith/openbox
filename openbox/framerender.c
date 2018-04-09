@@ -21,6 +21,7 @@
 #include "openbox.h"
 #include "screen.h"
 #include "client.h"
+#include "config.h"
 #include "framerender.h"
 #include "obrender/theme.h"
 
@@ -41,6 +42,9 @@ void framerender_frame(ObFrame *self)
     if (!self->visible)
         return;
     self->need_render = FALSE;
+
+    if ( !self->max_horz && !self->max_vert && config_theme_cornerradius )
+        frame_round_corners(self->window);
 
     {
         gulong px;
