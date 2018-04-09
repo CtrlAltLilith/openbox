@@ -135,7 +135,7 @@ AC_ARG_ENABLE(startup-notification,
 )
 
 if test "$enable_sn" = yes; then
-PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0 >= 0.8],
+PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0 >= 0.8 xi],
   [
     AC_DEFINE(USE_LIBSN, [1], [Use startup-notification])
     AC_SUBST(LIBSN_CFLAGS)

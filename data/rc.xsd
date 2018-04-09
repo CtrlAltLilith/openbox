@@ -437,6 +437,20 @@
             <xsd:pattern value="default|([1-9][0-9]*)(|%|/[1-9][0-9]*)"/>
         </xsd:restriction>
     </xsd:simpleType>
+    <xsd:simpleType name="horizontal_center_or_int">
+        <xsd:restriction base="xsd:string">
+            <!-- ob: atoi($_) unless $_ eq 'center'; -->
+            <!-- I think the regexp DTRT WRT atoi. -->
+            <xsd:pattern value="(Below|Above)?center|0|[1-9][0-9]*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="vertical_center_or_int">
+        <xsd:restriction base="xsd:string">
+            <!-- ob: atoi($_) unless $_ eq 'center'; -->
+            <!-- I think the regexp DTRT WRT atoi. -->
+            <xsd:pattern value="(LeftOf|RightOf)?center|0|[1-9][0-9]*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
     <xsd:simpleType name="mouse_or_int">
         <xsd:restriction base="xsd:string">
             <!-- ob: atoi($_) unless $_ eq 'center'; -->

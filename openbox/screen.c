@@ -41,6 +41,7 @@
 #include "obt/prop.h"
 
 #include <X11/Xlib.h>
+#include <X11/extensions/XInput2.h>
 #ifdef HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -1945,12 +1946,15 @@ const Rect* screen_physical_area_primary(gboolean fixed)
 
 void screen_set_root_cursor(void)
 {
+    int pointer_id;
+    if (!XIGetClientPointer(obt_display, None, &pointer_id))
+        return;
     if (sn_app_starting())
         XDefineCursor(obt_display, obt_root(ob_screen),
                       ob_cursor(OB_CURSOR_BUSY));
     else
-        XDefineCursor(obt_display, obt_root(ob_screen),
-                      ob_cursor(OB_CURSOR_POINTER));
+        XIDefineCursor(obt_display, pointer_id, obt_root(ob_screen),
+                       ob_cursor(OB_CURSOR_POINTER));
 }
 
 guint screen_find_monitor_point(guint x, guint y)

@@ -13,3 +13,4 @@ X-GNOME-Provides=windowmanager
 X-Ubuntu-Gettext-Domain=openbox
 # back compat
 X-GNOME-Autostart-Notify=true
+_Keywords=wm;windowmanager;window;manager;gnome;

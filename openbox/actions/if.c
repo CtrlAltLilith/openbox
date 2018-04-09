@@ -192,6 +192,7 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     set_bool(node, "urgent", &q->urgent_on, &q->urgent_off);
     set_bool(node, "undecorated", &q->decor_off, &q->decor_on);
     set_bool(node, "omnipresent", &q->omnipresent_on, &q->omnipresent_off);
+    set_bool(node, "fullscreen", &q->fullscreen_on, &q->fullscreen_off);
 
     xmlNodePtr n;
     if ((n = obt_xml_find_node(node, "desktop"))) {
@@ -199,7 +200,7 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
         if ((s = obt_xml_node_string(n))) {
             if (!g_ascii_strcasecmp(s, "current"))
                 q->desktop_current = TRUE;
-            else if (!g_ascii_strcasecmp(s, "other"))
+            if (!g_ascii_strcasecmp(s, "other"))
                 q->desktop_other = TRUE;
             else if (!g_ascii_strcasecmp(s, "last"))
                 q->desktop_last = TRUE;
@@ -403,6 +404,11 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
             is_true &= query_target->desktop == DESKTOP_ALL;
         if (q->omnipresent_off)
             is_true &= query_target->desktop != DESKTOP_ALL;
+
+        if (q->fullscreen_on)
+            is_true &= query_target->fullscreen;
+        if (q->fullscreen_off)
+            is_true &= !query_target->fullscreen;
 
         gboolean is_on_current_desktop =
             query_target->desktop == screen_desktop ||

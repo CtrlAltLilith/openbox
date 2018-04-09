@@ -1497,8 +1497,10 @@ static void read_button_styles(XrmDatabase db, const RrInstance *inst,
     READ_BUTTON_MASK_COPY(disabled, btn->unpressed_mask);
     READ_BUTTON_MASK_COPY(hover, btn->unpressed_mask);
     if (toggled_mask) {
-        READ_BUTTON_MASK_COPY(pressed_toggled, btn->unpressed_toggled_mask);
-        READ_BUTTON_MASK_COPY(hover_toggled, btn->unpressed_toggled_mask);
+        g_snprintf(name, 128, "%s_toggled_pressed.xbm", btnname);
+        READ_MASK_COPY(name, btn->pressed_toggled_mask, btn->unpressed_toggled_mask);
+        g_snprintf(name, 128, "%s_toggled_hover.xbm", btnname);
+        READ_MASK_COPY(name, btn->hover_toggled_mask, btn->unpressed_toggled_mask);
     }
 
 #define READ_BUTTON_APPEARANCE(typedots, type, fallback) \
@@ -1535,8 +1537,8 @@ static void read_button_styles(XrmDatabase db, const RrInstance *inst,
     READ_BUTTON_APPEARANCE("disabled", disabled, 0);
     READ_BUTTON_APPEARANCE("hover", hover, 0);
     if (toggled_mask) {
-        READ_BUTTON_APPEARANCE("unpressed.toggled", unpressed_toggled, 1);
-        READ_BUTTON_APPEARANCE("pressed.toggled", pressed_toggled, 0);
-        READ_BUTTON_APPEARANCE("hover.toggled", hover_toggled, 0);
+        READ_BUTTON_APPEARANCE("toggled.unpressed", unpressed_toggled, 1);
+        READ_BUTTON_APPEARANCE("toggled.pressed", pressed_toggled, 0);
+        READ_BUTTON_APPEARANCE("toggled.hover", hover_toggled, 0);
     }
 }
