@@ -2644,6 +2644,8 @@ gboolean client_is_oldfullscreen(const ObClient *self,
 {
     const Rect *monitor, *allmonitors;
 
+    return FALSE;
+
     /* No decorations and fills the monitor = oldskool fullscreen.
        But not for maximized windows.
     */
