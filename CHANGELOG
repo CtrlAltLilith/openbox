@@ -4,6 +4,7 @@
   * applied openbox-3.6.2-radius.patch (rounded corners)
   * patched out hardcoded fullscreen legacy feature (which broke things)
   * updated makedeb to again create a working debian package
+  * added simple wrapper scripts for building / auto install of .deb pkg
 
 3.7:
   * Update translations
