@@ -7,10 +7,10 @@ Standards-Version: 3.7.2
 
 Package: openbox
 Architecture: amd64
-Depends: libc6, libglib2.0-0, libxcursor1, libx11-6, libpango1.0-0, libice6, libsm6, libxext6, libxinerama1, libxml2, libstartup-notification0, libxft2, obconf, obsession
-Recommends: obconf, ttf-bitstream-vera
-Suggests: menu, x-display-manager, ksmserver | gnome-session, kdm | gdm
-Conflicts: menu (<< 2.1.12), openbox (<< 3.7-0)
-Provides: x-window-manager
+Depends: libc6 (>= 2.4), libglib2.0-0 (>= 2.35.9), libice6 (>= 1:1.0.0), libobrender32v5 (>= 3.6.0), libobt2v5 (>= 3.6.0), libsm6, libstartup-notification0 (>= 0.7), libx11-6, libxau6, libxcursor1 (>> 1.1.2), libxext6, libxi6 (>= 2:1.2.99.4), libxinerama1, libxrandr2
+Recommends: obconf, obsession, scrot, openbox-menu
+Suggests: fonts-dejavu, libxml2-dev, tint2, python, openbox-gnome-session (= 3.6.1-7), openbox-kde-session (= 3.6.1-7)
+Conflicts: openbox (<< 3.7-0)
+Provides: x-session-manager, x-window-manager
 Description: A minimalistic, highly configurable, next generation window manager with extensive standards support. (patched version)
  http://openbox.org/
