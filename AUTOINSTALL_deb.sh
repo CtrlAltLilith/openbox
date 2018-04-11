@@ -8,7 +8,7 @@ apt-get update && apt-get -y install gcc \
           libtool libpango1.0-dev pkg-config \
           libglib2.0-dev libxml2-dev \
           libstartup-notification0-dev \
-          xorg-dev libimlib2-dev \
+          xorg-dev libimlib2-dev uuid \
           build-essential devscripts dpkg-dev
 
 ./autobuild_deb.sh &&
