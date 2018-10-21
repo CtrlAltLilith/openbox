@@ -10,7 +10,7 @@ apt-get update && apt-get -y install gcc \
           libstartup-notification0-dev \
           xorg-dev libimlib2-dev uuid \
           build-essential devscripts dpkg-dev \
-          libpangoxft-1.0-0
+          libpangoxft-1.0-0 docbook-to-man
 
 ./autobuild_deb.sh &&
      ( dpkg -i ../openbox_${VERS}_$ARCH.deb ||
