@@ -43,7 +43,11 @@ void framerender_frame(ObFrame *self)
         return;
     self->need_render = FALSE;
 
-    if ( !self->max_horz && !self->max_vert && config_theme_cornerradius )
+    if (config_theme_cornerradius &&
+            !self->client->fullscreen &&
+            !self->max_horz && !self->max_vert &&
+            !self->client->shaped &&
+            !(self->client->type == OB_CLIENT_TYPE_DOCK))
         frame_round_corners(self->window);
 
     {

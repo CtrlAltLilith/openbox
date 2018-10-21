@@ -834,7 +834,7 @@ void menu_frame_render(ObMenuFrame *self)
 
     RECT_SET_SIZE(self->area, w, h);
 
-    if ( config_theme_menuradius )
+    if (config_theme_menuradius)
         frame_round_corners(self->window);
 
     XFlush(obt_display);

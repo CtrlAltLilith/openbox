@@ -339,13 +339,32 @@ void frame_round_corners(Window window)
 {
     XWindowAttributes win_attr;
     XGetWindowAttributes(obt_display, window, &win_attr);
-    int width = win_attr.width + win_attr.border_width;
-    int height = win_attr.height + win_attr.border_width;
-    Pixmap mask = XCreatePixmap(obt_display, window, width, height, 1);
-    XGCValues xgcv;
-    GC shape_gc = XCreateGC(obt_display, mask, 0, &xgcv);
+
+    // If this returns null, the window is invalid.
+    if(!XGetWindowAttributes(obt_display, window, &win_attr))
+        return;
+
+    int width = win_attr.border_width * 2 + win_attr.width;
+    int height = win_attr.border_width * 2 + win_attr.height;
     int rad = config_theme_cornerradius;
     int dia = 2 * rad;
+
+    // do not try to round if the window would be smaller than the corners
+    if(width < dia || height < dia)
+        return;
+
+    Pixmap mask = XCreatePixmap(obt_display, window, width, height, 1);
+    // if this returns null, the mask is not drawable
+    if(!mask)
+        return;
+
+    XGCValues xgcv;
+    GC shape_gc = XCreateGC(obt_display, mask, 0, &xgcv);
+    if(!shape_gc) {
+        XFreePixmap(obt_display, mask);
+        return;
+    }
+
     XSetForeground(obt_display, shape_gc, 0);
     XFillRectangle(obt_display, mask, shape_gc, 0, 0, width, height);
     XSetForeground(obt_display, shape_gc, 1);
@@ -356,8 +375,11 @@ void frame_round_corners(Window window)
         0, 23040);
     XFillRectangle(obt_display, mask, shape_gc, rad, 0, width-dia, height);
     XFillRectangle(obt_display, mask, shape_gc, 0, rad, width, height-dia);
-    XShapeCombineMask(obt_display, window, ShapeBounding, 0, 0, mask, ShapeSet);
+    XShapeCombineMask(obt_display, window, ShapeBounding,
+                      0-win_attr.border_width, 0-win_attr.border_width,
+                      mask, ShapeSet);
     XFreePixmap(obt_display, mask);
+    XFreeGC(obt_display, shape_gc);
 }
 
 void frame_adjust_area(ObFrame *self, gboolean moved,
@@ -444,7 +466,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_l && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbll,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_l,
@@ -467,7 +489,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_r && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbrr,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_r,
@@ -1912,7 +1934,7 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
                                FRAME_ANIMATE_ICONIFY_STEP_TIME,
                                frame_animate_iconify, self,
                                frame_end_iconify_animation);
-                               
+
 
         /* do the first step */
         frame_animate_iconify(self);

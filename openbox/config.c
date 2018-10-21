@@ -50,7 +50,7 @@ StrutPartial config_margins;
 gchar   *config_theme;
 gboolean config_theme_keepborder;
 guint    config_theme_window_list_icon_size;
-guint	 config_theme_cornerradius;
+guint    config_theme_cornerradius;
 gboolean config_theme_menuradius;
 
 gchar   *config_title_layout;

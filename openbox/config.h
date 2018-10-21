@@ -158,6 +158,7 @@ extern gboolean config_animate_iconify;
 extern guint config_theme_window_list_icon_size;
 /*! Display rounded corners for decorated windows */
 extern guint config_theme_cornerradius;
+/*! Display rounded corners for root and client-list menus */
 extern gboolean config_theme_menuradius;
 
 /*! The font for the active window's title */
