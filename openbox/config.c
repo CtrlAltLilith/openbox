@@ -35,6 +35,8 @@ gboolean config_focus_raise;
 gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 gboolean config_unfocus_leave;
+guint config_directional_distance_weight;
+guint config_directional_angle_weight;
 
 ObPlacePolicy  config_place_policy;
 gboolean       config_place_center;
@@ -48,6 +50,8 @@ StrutPartial config_margins;
 gchar   *config_theme;
 gboolean config_theme_keepborder;
 guint    config_theme_window_list_icon_size;
+guint    config_theme_cornerradius;
+gboolean config_theme_menuradius;
 
 gchar   *config_title_layout;
 
@@ -64,6 +68,7 @@ guint   config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
+gint    config_emulate_xinerama;
 
 gboolean         config_resize_redraw;
 gint             config_resize_popup_show;
@@ -448,11 +453,15 @@ static void parse_key(xmlNodePtr node, GList *keylist)
     gchar *keystring, **keys, **key;
     xmlNodePtr n;
     gboolean is_chroot = FALSE;
+    gboolean grab = TRUE;
+    gboolean repeat = FALSE;
 
     if (!obt_xml_attr_string(node, "key", &keystring))
         return;
 
     obt_xml_attr_bool(node, "chroot", &is_chroot);
+    obt_xml_attr_bool(node, "grab", &grab);
+    obt_xml_attr_bool(node, "repeat", &repeat);
 
     keys = g_strsplit(keystring, " ", 0);
     for (key = keys; *key; ++key) {
@@ -470,7 +479,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
 
                 action = actions_parse(n);
                 if (action)
-                    keyboard_bind(keylist, action);
+                    keyboard_bind(keylist, action, grab, !repeat);
                 n = obt_xml_find_node(n->next, "action");
             }
         }
@@ -635,6 +644,14 @@ static void parse_focus(xmlNodePtr node, gpointer d)
         config_focus_under_mouse = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "unfocusOnLeave")))
         config_unfocus_leave = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "directionalDistanceWeight")))
+        config_directional_distance_weight = obt_xml_node_int(n);
+    else
+        config_directional_distance_weight = 1U;
+    if ((n = obt_xml_find_node(node, "directionalAngleWeight")))
+        config_directional_angle_weight = obt_xml_node_int(n);
+    else
+        config_directional_angle_weight = 1U;
 }
 
 static void parse_placement(xmlNodePtr node, gpointer d)
@@ -646,6 +663,8 @@ static void parse_placement(xmlNodePtr node, gpointer d)
     if ((n = obt_xml_find_node(node, "policy"))) {
         if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
+        if (obt_xml_node_contains(n, "Random"))
+            config_place_policy = OB_PLACE_POLICY_RANDOM;
     }
     if ((n = obt_xml_find_node(node, "center"))) {
         config_place_center = obt_xml_node_bool(n);
@@ -719,6 +738,10 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         else if (config_theme_window_list_icon_size > 96)
             config_theme_window_list_icon_size = 96;
     }
+    if ((n = obt_xml_find_node(node, "cornerRadius"))) {
+	config_theme_cornerradius = obt_xml_node_int(n);
+	obt_xml_attr_bool(n, "menu", &config_theme_menuradius);
+    }
 
     for (n = obt_xml_find_node(node, "font");
          n;
@@ -754,7 +777,11 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         }
         if ((fnode = obt_xml_find_node(n->children, "size"))) {
             int s = obt_xml_node_int(fnode);
-            if (s > 0) size = s;
+            if (s > 0) {
+                size = s;
+                if (obt_xml_attr_contains(fnode, "type", "absolute"))
+                    size = -size;
+            }
         }
         if ((fnode = obt_xml_find_node(n->children, "weight"))) {
             gchar *w = obt_xml_node_string(fnode);
@@ -773,6 +800,12 @@ static void parse_theme(xmlNodePtr node, gpointer d)
 
         *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
         g_free(name);
+
+        if ((fnode = obt_xml_find_node(n->children, "description"))) {
+            gchar *s = obt_xml_node_string(fnode);
+            RrFontDescriptionFromString(*font, s);
+            g_free(s);
+        }
     }
 }
 
@@ -792,6 +825,8 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
         if (d > 0)
             config_screen_firstdesk = (unsigned) d;
     }
+    if ((n = obt_xml_find_node(node, "emulatexinerama")))
+        config_emulate_xinerama = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "names"))) {
         GSList *it;
         xmlNodePtr nname;
@@ -996,7 +1031,7 @@ static void bind_default_keyboard(void)
     };
     for (it = binds; it->key; ++it) {
         GList *l = g_list_append(NULL, g_strdup(it->key));
-        keyboard_bind(l, actions_parse_string(it->actname));
+        keyboard_bind(l, actions_parse_string(it->actname), TRUE, TRUE);
     }
 }
 
@@ -1098,6 +1133,8 @@ void config_startup(ObtXmlInst *i)
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
     config_theme_window_list_icon_size = 36;
+    config_theme_cornerradius = 0;
+    config_theme_menuradius = TRUE;
 
     config_font_activewindow = NULL;
     config_font_inactivewindow = NULL;
@@ -1110,6 +1147,7 @@ void config_startup(ObtXmlInst *i)
 
     config_desktops_num = 4;
     config_screen_firstdesk = 1;
+    config_emulate_xinerama = FALSE;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
 

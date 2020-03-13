@@ -85,6 +85,10 @@ extern gboolean config_focus_under_mouse;
 /*! Remove focus from windows when the mouse leaves them
  */
 extern gboolean config_unfocus_leave;
+/*! Weight of distance part of score for directional switching */
+extern guint config_directional_distance_weight;
+/*! Weight of angle part of score for directional switching */
+extern guint config_directional_angle_weight;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;
@@ -152,6 +156,10 @@ extern gchar *config_title_layout;
 extern gboolean config_animate_iconify;
 /*! Size of icons in focus switching dialogs */
 extern guint config_theme_window_list_icon_size;
+/*! Display rounded corners for decorated windows */
+extern guint config_theme_cornerradius;
+/*! Display rounded corners for root and client-list menus */
+extern gboolean config_theme_menuradius;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;
@@ -170,6 +178,8 @@ extern RrFont *config_font_inactiveosd;
 extern guint config_desktops_num;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
 extern guint config_screen_firstdesk;
+/*! Emulate xinerama by dividing screen in two halves, left and right. */
+extern gboolean config_emulate_xinerama;
 /*! Names for the desktops */
 extern GSList *config_desktops_names;
 /*! Amount of time to show the desktop switch dialog */

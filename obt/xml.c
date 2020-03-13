@@ -144,10 +144,13 @@ static gboolean load_file(ObtXmlInst *i,
         gchar *path;
         struct stat s;
 
-        if (!domain && !filename) /* given a full path to the file */
+        if (!domain && !filename){ /* given a full path to the file */
             path = g_strdup(it->data);
-        else
+        } else if(filename && filename[0] == '/' && stat(filename, &s) >= 0) {
+            path = g_strdup(filename);
+        } else {
             path = g_build_filename(it->data, domain, filename, NULL);
+        }
 
         if (stat(path, &s) >= 0) {
             /* XML_PARSE_BLANKS is needed apparently, or the tree can end up

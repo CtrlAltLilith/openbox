@@ -13,14 +13,14 @@ AC_DEFUN([X11_DEVEL],
   OLDCPPFLAGS=$CPPFLAGS
 
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  X_LIBS="$X_PRE_LIBS $X_LIBS -lX11"
+  X_LIBS="$X_PRE_LIBS $X_LIBS -lX11 -lXi"
   LIBS="$LIBS $X_LIBS"
 
-  # Check for required functions in -lX11
+  # Check for required functions in -lX11 -lXi
   AC_CHECK_LIB(
     [X11], [XOpenDisplay],
     ,
-    AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
+    AC_MSG_ERROR([Could not find XOpenDisplay in -lX11 -lXi.])
   )
 
   # Restore the old values. Use X_CFLAGS and X_LIBS in

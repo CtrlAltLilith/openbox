@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "openbox.h"
 #include "dock.h"
+#include "edges.h"
 #include "grab.h"
 #include "startupnotify.h"
 #include "moveresize.h"
@@ -40,6 +41,7 @@
 #include "obt/prop.h"
 
 #include <X11/Xlib.h>
+#include <X11/extensions/XInput2.h>
 #ifdef HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -54,7 +56,7 @@
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm(void);
-static void     screen_tell_ksplash(void);
+//static void     screen_tell_ksplash(void);
 static void     screen_fallback_focus(void);
 
 guint                  screen_num_desktops;
@@ -79,7 +81,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup *desktop_popup;
+static ObPagerPopup **desktop_popup;
 static guint         desktop_popup_timer = 0;
 static gboolean      desktop_popup_perm;
 
@@ -169,7 +171,7 @@ gboolean screen_annex(void)
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
-    attrib.event_mask = PropertyChangeMask;
+    attrib.event_mask = PropertyChangeMask | KeyPressMask | KeyReleaseMask;
     screen_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
                                        -100, -100, 1, 1, 0,
                                        CopyFromParent, InputOutput,
@@ -294,11 +296,14 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_FRAME_STRUT);
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE);
 
+    supported[i++] = OBT_PROP_ATOM(OB_FOCUS);
     supported[i++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
     supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
+    supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_LOCKED);
     supported[i++] = OBT_PROP_ATOM(OPENBOX_PID);
     supported[i++] = OBT_PROP_ATOM(OB_THEME);
     supported[i++] = OBT_PROP_ATOM(OB_CONFIG_FILE);
+    supported[i++] = OBT_PROP_ATOM(OB_LAST_DESKTOP);
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
     supported[i++] = OBT_PROP_ATOM(OB_VERSION);
     supported[i++] = OBT_PROP_ATOM(OB_APP_ROLE);
@@ -308,6 +313,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_APP_GROUP_NAME);
     supported[i++] = OBT_PROP_ATOM(OB_APP_GROUP_CLASS);
     supported[i++] = OBT_PROP_ATOM(OB_APP_TYPE);
+    supported[i++] = OBT_PROP_ATOM(OB_TARGET_WINDOW);
     g_assert(i == num_support);
 
     OBT_PROP_SETA32(obt_root(ob_screen),
@@ -317,11 +323,11 @@ gboolean screen_annex(void)
     OBT_PROP_SETS(RootWindow(obt_display, ob_screen), OB_VERSION,
                   OPENBOX_VERSION);
 
-    screen_tell_ksplash();
+    //screen_tell_ksplash();
 
     return TRUE;
 }
-
+#if 0
 static void screen_tell_ksplash(void)
 {
     XEvent e;
@@ -355,23 +361,32 @@ static void screen_tell_ksplash(void)
     XSendEvent(obt_display, obt_root(ob_screen),
                False, SubstructureNotifyMask, &e);
 }
-
+#endif
 void screen_startup(gboolean reconfig)
 {
     gchar **names = NULL;
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_popup = pager_popup_new();
     desktop_popup_perm = FALSE;
-    pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {
-        /* update the pager popup's width */
-        pager_popup_text_width_to_strings(desktop_popup,
-                                          screen_desktop_names,
-                                          screen_num_desktops);
+        guint i;
+        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
+        for (i = 0; i < screen_num_monitors; i++) {
+            desktop_popup[i] = pager_popup_new();
+            desktop_popup[i]->popup->a_text->texture[0].data.text.font = ob_rr_theme->menu_title_font;
+            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
+
+            /* update the pager popup's width */
+            pager_popup_text_width_to_strings(desktop_popup[i],
+                                              screen_desktop_names,
+                                              screen_num_desktops);
+        }
+
         return;
+    } else {
+        desktop_popup = NULL;
     }
 
     /* get the initial size */
@@ -442,7 +457,11 @@ void screen_startup(gboolean reconfig)
     else
         screen_set_desktop(MIN(config_screen_firstdesk,
                                screen_num_desktops) - 1, FALSE);
-    screen_last_desktop = screen_desktop;
+    OBT_PROP_GET32(obt_root(ob_screen), OB_LAST_DESKTOP, CARDINAL, &screen_last_desktop);
+    if (screen_last_desktop < 0 || screen_last_desktop >= screen_num_desktops) {
+        screen_last_desktop = screen_desktop;
+        OBT_PROP_SET32(obt_root(ob_screen), OB_LAST_DESKTOP, CARDINAL, screen_last_desktop);
+    }
 
     /* don't start in showing-desktop mode */
     screen_show_desktop_mode = SCREEN_SHOW_DESKTOP_NO;
@@ -460,7 +479,12 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    pager_popup_free(desktop_popup);
+    guint i;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_free(desktop_popup[i]);
+    }
+    g_free(desktop_popup);
 
     if (reconfig)
         return;
@@ -500,11 +524,13 @@ void screen_resize(void)
 
     /* this calls screen_update_areas(), which we need ! */
     dock_configure();
+    edges_configure();
 
-    for (it = client_list; it; it = g_list_next(it)) {
-        client_move_onscreen(it->data, FALSE);
-        client_reconfigure(it->data, FALSE);
-    }
+    // bug: this is done in screen_update_areas() already
+//    for (it = client_list; it; it = g_list_next(it)) {
+//        client_move_onscreen(it->data, FALSE);
+//        client_reconfigure(it->data, FALSE);
+//    }
 }
 
 void screen_set_num_desktops(guint num)
@@ -602,6 +628,7 @@ static void screen_fallback_focus(void)
 static gboolean last_desktop_func(gpointer data)
 {
     screen_desktop_timeout = TRUE;
+    OBT_PROP_SET32(obt_root(ob_screen), OB_LAST_DESKTOP, CARDINAL, screen_last_desktop);
     screen_desktop_timer = 0;
     return FALSE; /* don't repeat */
 }
@@ -938,30 +965,37 @@ static guint translate_row_col(guint r, guint c)
 
 static gboolean hide_desktop_popup_func(gpointer data)
 {
-    pager_popup_hide(desktop_popup);
+    guint i;
+
     desktop_popup_timer = 0;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_hide(desktop_popup[i]);
+    }
     return FALSE; /* don't repeat */
 }
 
 void screen_show_desktop_popup(guint d, gboolean perm)
 {
     const Rect *a;
+    guint i;
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    a = screen_physical_area_primary(FALSE);
-    pager_popup_position(desktop_popup, CenterGravity,
-                         a->x + a->width / 2, a->y + a->height / 2);
-    pager_popup_icon_size_multiplier(desktop_popup,
-                                     (screen_desktop_layout.columns /
-                                      screen_desktop_layout.rows) / 2,
-                                     (screen_desktop_layout.rows/
-                                      screen_desktop_layout.columns) / 2);
-    pager_popup_max_width(desktop_popup,
-                          MAX(a->width/3, POPUP_WIDTH));
-    pager_popup_show(desktop_popup, screen_desktop_names[d], d);
-
+    for (i = 0; i < screen_num_monitors; i++) {
+        a = screen_physical_area_monitor(i);
+        pager_popup_position(desktop_popup[i], CenterGravity,
+                             a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_icon_size_multiplier(desktop_popup[i],
+                                         (screen_desktop_layout.columns /
+                                          screen_desktop_layout.rows) / 2,
+                                         (screen_desktop_layout.rows/
+                                          screen_desktop_layout.columns) / 2);
+        pager_popup_max_width(desktop_popup[i],
+                              MAX(a->width/3, POPUP_WIDTH));
+        pager_popup_show(desktop_popup[i], screen_desktop_names[d], d);
+    }
     if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
     desktop_popup_timer = 0;
     if (!perm && !desktop_popup_perm)
@@ -977,8 +1011,12 @@ void screen_hide_desktop_popup(void)
 {
     if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
     desktop_popup_timer = 0;
-    pager_popup_hide(desktop_popup);
     desktop_popup_perm = FALSE;
+    guint i;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_hide(desktop_popup[i]);
+    }
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -1213,9 +1251,11 @@ void screen_update_desktop_names(void)
     }
 
     /* resize the pager for these names */
-    pager_popup_text_width_to_strings(desktop_popup,
-                                      screen_desktop_names,
-                                      screen_num_desktops);
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_text_width_to_strings(desktop_popup[i],
+                                          screen_desktop_names,
+                                          screen_num_desktops);
+    }
 }
 
 void screen_show_desktop(ObScreenShowDestopMode show_mode, ObClient *show_only)
@@ -1373,6 +1413,20 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
         *xin_areas = g_new(Rect, *nxin + 1);
         RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
         RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
+    } else if (config_emulate_xinerama) {
+    *nxin = 2;
+    *xin_areas = g_new(Rect, *nxin + 1);
+    RECT_SET((*xin_areas)[0], 0, 0,
+                 WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen)) / 2,
+                 HeightOfScreen(ScreenOfDisplay(obt_display, ob_screen)));
+    RECT_SET((*xin_areas)[1],
+                 WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen)) / 2,
+                 0,
+                 WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen)) / 2,
+                 HeightOfScreen(ScreenOfDisplay(obt_display, ob_screen)));
+    RECT_SET((*xin_areas)[*nxin], 0, 0,
+                 WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen)),
+                 HeightOfScreen(ScreenOfDisplay(obt_display, ob_screen)));
     }
 #ifdef XINERAMA
     else if (obt_display_extension_xinerama &&
@@ -1430,6 +1484,20 @@ void screen_update_areas(void)
 
     g_free(monitor_area);
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
+
+    if (!desktop_popup) {
+        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
+        for (i = 0; i < screen_num_monitors; i++) {
+            desktop_popup[i] = pager_popup_new();
+            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
+
+            if (screen_desktop_names)
+                /* update the pager popup's width */
+                pager_popup_text_width_to_strings(desktop_popup[i],
+                                                  screen_desktop_names,
+                                                  screen_num_desktops);
+        }
+    }
 
     /* set up the user-specified margins */
     config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);
@@ -1878,12 +1946,15 @@ const Rect* screen_physical_area_primary(gboolean fixed)
 
 void screen_set_root_cursor(void)
 {
+    int pointer_id;
+    if (!XIGetClientPointer(obt_display, None, &pointer_id))
+        return;
     if (sn_app_starting())
         XDefineCursor(obt_display, obt_root(ob_screen),
-                      ob_cursor(OB_CURSOR_BUSYPOINTER));
+                      ob_cursor(OB_CURSOR_BUSY));
     else
-        XDefineCursor(obt_display, obt_root(ob_screen),
-                      ob_cursor(OB_CURSOR_POINTER));
+        XIDefineCursor(obt_display, pointer_id, obt_root(ob_screen),
+                       ob_cursor(OB_CURSOR_POINTER));
 }
 
 guint screen_find_monitor_point(guint x, guint y)
@@ -1903,18 +1974,21 @@ guint screen_monitor_pointer()
 
 gboolean screen_pointer_pos(gint *x, gint *y)
 {
-    Window w;
     gint i;
-    guint u;
     gboolean ret;
 
+    /* we don't care about any of these return values, but we can't pass NULL */
+    Window w;
+    guint u;
+    gint j;
+
     ret = !!XQueryPointer(obt_display, obt_root(ob_screen),
-                          &w, &w, x, y, &i, &i, &u);
+                          &w, &w, x, y, &j, &j, &u);
     if (!ret) {
         for (i = 0; i < ScreenCount(obt_display); ++i)
             if (i != ob_screen)
-                if (XQueryPointer(obt_display, obt_root(i),
-                                  &w, &w, x, y, &i, &i, &u))
+                if ((ret=XQueryPointer(obt_display, obt_root(i),
+                                  &w, &w, x, y, &j, &j, &u)))
                     break;
     }
     return ret;

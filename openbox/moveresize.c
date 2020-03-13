@@ -268,6 +268,11 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     moveresize_in_progress = TRUE;
     waiting_for_sync = 0;
 
+    if (moving)
+        do_move(FALSE, 0);
+    else
+        do_resize();
+
 #ifdef SYNC
     if (config_resize_redraw && !moving && obt_display_extension_sync &&
         moveresize_client->sync_request && moveresize_client->sync_counter &&
@@ -951,9 +956,22 @@ gboolean moveresize_event(XEvent *e)
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
+            XEvent ce;
+            ObtXQueueWindowType wt;
+
+            wt.window = e->xmotion.window;
+            wt.type = MotionNotify;
+            while (xqueue_remove_local(&ce, xqueue_match_window_type, &wt)) {
+                e->xmotion.x = ce.xmotion.x;
+                e->xmotion.y = ce.xmotion.y;
+                e->xmotion.x_root = ce.xmotion.x_root;
+                e->xmotion.y_root = ce.xmotion.y_root;
+            }
+
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
             do_move(FALSE, 0);
+            XSync(obt_display, FALSE);
             do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
             gint dw, dh;

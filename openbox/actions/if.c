@@ -58,6 +58,10 @@ typedef struct {
     gboolean maxfull_off;
     gboolean iconic_on;
     gboolean iconic_off;
+    gboolean fullscreen_on;
+    gboolean fullscreen_off;
+    gboolean locked_on;
+    gboolean locked_off;
     gboolean focused;
     gboolean unfocused;
     gboolean urgent_on;
@@ -68,6 +72,7 @@ typedef struct {
     gboolean omnipresent_off;
     gboolean desktop_current;
     gboolean desktop_other;
+    gboolean desktop_last;
     guint    desktop_number;
     guint    screendesktop_number;
     guint    client_monitor;
@@ -181,10 +186,13 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     set_bool(node, "maximizedhorizontal", &q->maxhorz_on, &q->maxhorz_off);
     set_bool(node, "maximizedvertical", &q->maxvert_on, &q->maxvert_off);
     set_bool(node, "iconified", &q->iconic_on, &q->iconic_off);
+    set_bool(node, "fullscreen", &q->fullscreen_on, &q->fullscreen_off);
+    set_bool(node, "locked", &q->locked_on, &q->locked_off);
     set_bool(node, "focused", &q->focused, &q->unfocused);
     set_bool(node, "urgent", &q->urgent_on, &q->urgent_off);
     set_bool(node, "undecorated", &q->decor_off, &q->decor_on);
     set_bool(node, "omnipresent", &q->omnipresent_on, &q->omnipresent_off);
+    set_bool(node, "fullscreen", &q->fullscreen_on, &q->fullscreen_off);
 
     xmlNodePtr n;
     if ((n = obt_xml_find_node(node, "desktop"))) {
@@ -194,6 +202,8 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
                 q->desktop_current = TRUE;
             if (!g_ascii_strcasecmp(s, "other"))
                 q->desktop_other = TRUE;
+            else if (!g_ascii_strcasecmp(s, "last"))
+                q->desktop_last = TRUE;
             else
                 q->desktop_number = atoi(s);
             g_free(s);
@@ -343,6 +353,16 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         if (q->iconic_off)
             is_true &= !query_target->iconic;
 
+        if (q->fullscreen_on)
+            is_true &= query_target->fullscreen;
+        if (q->fullscreen_off)
+            is_true &= !query_target->fullscreen;
+
+        if (q->locked_on)
+            is_true &= query_target->locked;
+        if (q->locked_off)
+            is_true &= !query_target->locked;
+
         if (q->maxhorz_on)
             is_true &= query_target->max_horz;
         if (q->maxhorz_off)
@@ -385,6 +405,11 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         if (q->omnipresent_off)
             is_true &= query_target->desktop != DESKTOP_ALL;
 
+        if (q->fullscreen_on)
+            is_true &= query_target->fullscreen;
+        if (q->fullscreen_off)
+            is_true &= !query_target->fullscreen;
+
         gboolean is_on_current_desktop =
             query_target->desktop == screen_desktop ||
             query_target->desktop == DESKTOP_ALL;
@@ -392,6 +417,8 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
             is_true &= is_on_current_desktop;
         if (q->desktop_other)
             is_true &= !is_on_current_desktop;
+        if (q->desktop_last)
+            is_true &= query_target->desktop == screen_last_desktop;
 
         if (q->desktop_number) {
             gboolean is_on_desktop =
