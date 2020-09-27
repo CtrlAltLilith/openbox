@@ -204,7 +204,7 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         XMoveResizeWindow(obt_display, focus_indicator.left.window,
                           x, y, w, h);
-        a_focus_indicator->texture[0].data.lineart.x1 = w-1;
+        a_focus_indicator->texture[0].data.lineart.x1 = w;
         a_focus_indicator->texture[0].data.lineart.y1 = 0;
         a_focus_indicator->texture[0].data.lineart.x2 = 0;
         a_focus_indicator->texture[0].data.lineart.y2 = 0;
