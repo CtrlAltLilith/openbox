@@ -242,6 +242,7 @@ void client_manage(Window window, ObPrompt *prompt)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
+    self->monitor = screen_num_monitors; /* always an invalid value */
 
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
@@ -324,8 +325,8 @@ void client_manage(Window window, ObPrompt *prompt)
         (user_time != 0) &&
         /* this checks for focus=false for the window */
         settings->focus != 0 &&
-        focus_valid_target(self, self->desktop,
-                           FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+        focus_valid_target(self, self->desktop, 0,
+                           FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
     {
         try_activate = TRUE;
@@ -3311,13 +3312,26 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        watch out tho, don't try change stacking stuff if the window is no
        longer being managed !
     */
-    if (self->managed &&
-        (screen_find_monitor(&self->frame->area) !=
-         screen_find_monitor(&oldframe) ||
-         (final && (client_is_oldfullscreen(self, &oldclient) !=
-                    client_is_oldfullscreen(self, &self->area)))))
+    if (self->managed)
     {
-        client_calc_layer(self);
+        guint i;
+        gboolean monitorchanged;
+
+        i = screen_find_monitor(&self->frame->area);
+        monitorchanged = self->monitor != i;
+
+        if (monitorchanged) {
+            self->monitor = i;
+            focus_cycle_addremove(self, TRUE);
+            ob_debug("Window %s is now on monitor %d",
+                     self->title, self->monitor);
+        }
+        if (monitorchanged ||
+            (final && (client_is_oldfullscreen(self, &oldclient) !=
+                       client_is_oldfullscreen(self, &self->area))))
+        {
+            client_calc_layer(self);
+        }
     }
 }
 

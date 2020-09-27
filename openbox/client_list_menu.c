@@ -54,8 +54,8 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
 
     for (it = focus_order; it; it = g_list_next(it)) {
         ObClient *c = it->data;
-        if (focus_valid_target(c, d->desktop,
-                               TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)) {
+        if (focus_valid_target(c, d->desktop, 0,
+                               TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE)) {
             ObMenuEntry *e;
 
             empty = FALSE;

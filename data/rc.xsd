@@ -155,6 +155,7 @@
             <xsd:element minOccurs="0" name="startupnotify" type="ob:notify"/>
             <xsd:element minOccurs="0" name="command" type="xsd:string"/>
             <xsd:element minOccurs="0" name="allDesktops" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="allMonitors" type="ob:bool"/>
             <xsd:element minOccurs="0" name="menu" type="xsd:string"/>
             <xsd:element minOccurs="0" name="delta" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="x" type="xsd:integer"/>
