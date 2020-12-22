@@ -94,7 +94,7 @@ gboolean obt_display_open(const char *display_name)
         obt_display_extension_xinerama =
             XineramaQueryExtension(d,
                                    &obt_display_extension_xinerama_basep,
-                                   &junk) && XineramaIsActive(d);
+                                   &junk);
         if (!obt_display_extension_xinerama)
             g_message("Xinerama extension is not present on the server");
 #endif

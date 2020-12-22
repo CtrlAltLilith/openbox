@@ -1376,6 +1376,7 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
     }
 #ifdef XINERAMA
     else if (obt_display_extension_xinerama &&
+             XineramaIsActive(obt_display) &&
              (info = XineramaQueryScreens(obt_display, &n))) {
         *nxin = n;
         *xin_areas = g_new(Rect, *nxin + 1);
