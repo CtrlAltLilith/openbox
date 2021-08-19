@@ -1,0 +1,48 @@
+# Fork Features 
+* rounded corners with configurable bottom. (JJMorton)
+
+Argument description | Example
+------------ | -------------
+Enable rounded corners on menus | menu="yes"
+Enable rounded corners on window bottom | bottom="yes"
+
+* HJKL motion keys (mstuehn) 
+* Window snapping (emilypeto)
+* Scripts updated to Python 3 (troycurtisjr)
+* <allMonitors> option to NextWindow and PreviousWindow (yut23)
+>Enabled by default for backwards compatibility.
+If disabled, the window switcher will only show windows from the current
+monitor (for now, that's where the pointer is). The popup will stay on
+that monitor until a window is selected, even the pointer moves to
+another monitor.
+
+>To implement this efficiently, I have each client keep track of their
+current monitor. This may need more extensive testing to make sure it
+doesn't miss any movement methods. ~ Yut23 commit
+* Compiler deprication warning fixes (yut23)
+* 2018 Debian fixes by photon
+# Openbox
+
+Copyright (C) 2004  Mikael Magnusson
+
+Copyright (C) 2002  Dana Jansens
+
+----
+
+    This software is OSI Certified Open Source Software.
+    OSI Certified is a certification mark of the Open Source Initiative.
+
+----
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    See the COPYING file for a copy of the GNU General Public License.
+
