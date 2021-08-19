@@ -52,7 +52,7 @@ gboolean config_theme_keepborder;
 guint    config_theme_window_list_icon_size;
 guint    config_theme_cornerradius;
 gboolean config_theme_menuradius;
-
+gboolean config_theme_bottomradius;
 gchar   *config_title_layout;
 
 gboolean config_animate_iconify;
@@ -738,9 +738,10 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         else if (config_theme_window_list_icon_size > 96)
             config_theme_window_list_icon_size = 96;
     }
-    if ((n = obt_xml_find_node(node, "cornerRadius"))) {
-	config_theme_cornerradius = obt_xml_node_int(n);
-	obt_xml_attr_bool(n, "menu", &config_theme_menuradius);
+        if ((n = obt_xml_find_node(node, "cornerRadius"))) {
+        config_theme_cornerradius = obt_xml_node_int(n);
+        obt_xml_attr_bool(n, "menu", &config_theme_menuradius);
+        obt_xml_attr_bool(n, "bottom", &config_theme_bottomradius);
     }
 
     for (n = obt_xml_find_node(node, "font");
@@ -1135,7 +1136,7 @@ void config_startup(ObtXmlInst *i)
     config_theme_window_list_icon_size = 36;
     config_theme_cornerradius = 0;
     config_theme_menuradius = TRUE;
-
+    config_theme_bottomradius = TRUE;
     config_font_activewindow = NULL;
     config_font_inactivewindow = NULL;
     config_font_menuitem = NULL;

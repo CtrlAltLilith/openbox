@@ -16,8 +16,8 @@
 
    See the COPYING file for a copy of the GNU General Public License.
 */
-
 #include "frame.h"
+
 #include "menuframe.h"
 #include "client.h"
 #include "menu.h"
@@ -833,7 +833,6 @@ void menu_frame_render(ObMenuFrame *self)
     h += ob_rr_theme->mbwidth * 2;
 
     RECT_SET_SIZE(self->area, w, h);
-
     if (config_theme_menuradius)
         frame_round_corners(self->window);
 

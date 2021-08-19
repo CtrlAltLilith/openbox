@@ -160,6 +160,11 @@ extern guint config_theme_window_list_icon_size;
 extern guint config_theme_cornerradius;
 /*! Display rounded corners for root and client-list menus */
 extern gboolean config_theme_menuradius;
+/*! Display rounded corners on the botttom of decorated windows */
+extern gboolean config_theme_bottomradius;
+
+ /*! The font for the active window's title */
+extern RrFont *config_font_activewindow;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;

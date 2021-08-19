@@ -334,7 +334,6 @@ void frame_adjust_shape(ObFrame *self)
 #endif
 #endif
 }
-
 void frame_round_corners(Window window)
 {
     XWindowAttributes win_attr;
@@ -370,14 +369,16 @@ void frame_round_corners(Window window)
     XSetForeground(obt_display, shape_gc, 1);
     XFillArc(obt_display, mask, shape_gc, 0, 0, dia, dia, 0, 23040);
     XFillArc(obt_display, mask, shape_gc, width-dia-1, 0, dia, dia, 0, 23040);
-    XFillArc(obt_display, mask, shape_gc, 0, height-dia-1, dia, dia, 0, 23040);
-    XFillArc(obt_display, mask, shape_gc, width-dia-1, height-dia-1, dia, dia,
-        0, 23040);
+    if (config_theme_bottomradius) {
+        XFillArc(obt_display, mask, shape_gc, 0, height-dia-1, dia, dia, 0, 23040);
+        XFillArc(obt_display, mask, shape_gc, width-dia-1, height-dia-1, dia, dia, 0, 23040);
+    }
     XFillRectangle(obt_display, mask, shape_gc, rad, 0, width-dia, height);
-    XFillRectangle(obt_display, mask, shape_gc, 0, rad, width, height-dia);
-    XShapeCombineMask(obt_display, window, ShapeBounding,
-                      0-win_attr.border_width, 0-win_attr.border_width,
-                      mask, ShapeSet);
+    if (config_theme_bottomradius)
+        XFillRectangle(obt_display, mask, shape_gc, 0, rad, width, height-dia);
+    else
+        XFillRectangle(obt_display, mask, shape_gc, 0, rad, width, height);
+    XShapeCombineMask(obt_display, window, ShapeBounding, 0-win_attr.border_width, 0-win_attr.border_width, mask, ShapeSet);
     XFreePixmap(obt_display, mask);
     XFreeGC(obt_display, shape_gc);
 }
@@ -931,8 +932,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     {
         XResizeWindow(obt_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
-	self->need_render = TRUE;
-    }
+                      	self->need_render = TRUE;
+    }    
     framerender_frame(self);
 }
 
@@ -1007,7 +1008,7 @@ void frame_adjust_client_area(ObFrame *self)
     XMoveResizeWindow(obt_display, self->backfront, 0, 0,
                       self->client->area.width,
                       self->client->area.height);
-    self->need_render = TRUE;
+                          self->need_render = TRUE;
     framerender_frame(self);
 }
 
