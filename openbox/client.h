@@ -270,6 +270,10 @@ struct _ObClient
     gboolean max_vert;
     /*! The window is maximized to fill the screen horizontally */
     gboolean max_horz;
+    /*! The window is snapped to fill the left side of the screen */
+    gboolean snapped_left;
+    /*! The window is snapped to fill the right side of the screen */
+    gboolean snapped_right;
     /*! The window should not be displayed by pagers */
     gboolean skip_pager;
     /*! The window should not be displayed by taskbars */
