@@ -1,6 +1,8 @@
 openbox (@version@) unstable; urgency=low
 
   * Upstream release.
+  * applied debian patches
+  * applied rounded corners patch =)
+  * patched out hardcoded legacy [auto-]fullscreen feature! ;)
 
- -- Dana Jansens <danakj@orodu.net>  @time@
-
+ -- Alexander Taute <photon@nailara.net>  @time@

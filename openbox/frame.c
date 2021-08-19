@@ -28,6 +28,7 @@
 #include "focus_cycle_indicator.h"
 #include "moveresize.h"
 #include "screen.h"
+#include "edges.h"
 #include "obrender/theme.h"
 #include "obt/display.h"
 #include "obt/xqueue.h"
@@ -318,7 +319,7 @@ void frame_adjust_shape_kind(ObFrame *self, int kind)
         }
 
         XShapeCombineRectangles(obt_display, self->window,
-                                ShapeBounding, 0, 0, xrect, num,
+                                kind, 0, 0, xrect, num,
                                 ShapeUnion, Unsorted);
     }
 }
@@ -332,6 +333,53 @@ void frame_adjust_shape(ObFrame *self)
   frame_adjust_shape_kind(self, ShapeInput);
 #endif
 #endif
+}
+
+void frame_round_corners(Window window)
+{
+    XWindowAttributes win_attr;
+    XGetWindowAttributes(obt_display, window, &win_attr);
+
+    // If this returns null, the window is invalid.
+    if(!XGetWindowAttributes(obt_display, window, &win_attr))
+        return;
+
+    int width = win_attr.border_width * 2 + win_attr.width;
+    int height = win_attr.border_width * 2 + win_attr.height;
+    int rad = config_theme_cornerradius;
+    int dia = 2 * rad;
+
+    // do not try to round if the window would be smaller than the corners
+    if(width < dia || height < dia)
+        return;
+
+    Pixmap mask = XCreatePixmap(obt_display, window, width, height, 1);
+    // if this returns null, the mask is not drawable
+    if(!mask)
+        return;
+
+    XGCValues xgcv;
+    GC shape_gc = XCreateGC(obt_display, mask, 0, &xgcv);
+    if(!shape_gc) {
+        XFreePixmap(obt_display, mask);
+        return;
+    }
+
+    XSetForeground(obt_display, shape_gc, 0);
+    XFillRectangle(obt_display, mask, shape_gc, 0, 0, width, height);
+    XSetForeground(obt_display, shape_gc, 1);
+    XFillArc(obt_display, mask, shape_gc, 0, 0, dia, dia, 0, 23040);
+    XFillArc(obt_display, mask, shape_gc, width-dia-1, 0, dia, dia, 0, 23040);
+    XFillArc(obt_display, mask, shape_gc, 0, height-dia-1, dia, dia, 0, 23040);
+    XFillArc(obt_display, mask, shape_gc, width-dia-1, height-dia-1, dia, dia,
+        0, 23040);
+    XFillRectangle(obt_display, mask, shape_gc, rad, 0, width-dia, height);
+    XFillRectangle(obt_display, mask, shape_gc, 0, rad, width, height-dia);
+    XShapeCombineMask(obt_display, window, ShapeBounding,
+                      0-win_attr.border_width, 0-win_attr.border_width,
+                      mask, ShapeSet);
+    XFreePixmap(obt_display, mask);
+    XFreeGC(obt_display, shape_gc);
 }
 
 void frame_adjust_area(ObFrame *self, gboolean moved,
@@ -418,7 +466,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_l && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbll,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_l,
@@ -441,7 +489,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_r && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbrr,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_r,
@@ -857,7 +905,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         if (resized) {
             self->need_render = TRUE;
-            framerender_frame(self);
             frame_adjust_shape(self);
         }
 
@@ -884,7 +931,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
     {
         XResizeWindow(obt_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
+	self->need_render = TRUE;
     }
+    framerender_frame(self);
 }
 
 static void frame_adjust_cursors(ObFrame *self)
@@ -958,6 +1007,8 @@ void frame_adjust_client_area(ObFrame *self)
     XMoveResizeWindow(obt_display, self->backfront, 0, 0,
                       self->client->area.width,
                       self->client->area.height);
+    self->need_render = TRUE;
+    framerender_frame(self);
 }
 
 void frame_adjust_state(ObFrame *self)
@@ -1386,6 +1437,22 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
     else if (!g_ascii_strcasecmp("Dock", name))
         return OB_FRAME_CONTEXT_DOCK;
+    else if (!g_ascii_strcasecmp("ScreenTop", name))
+        return OB_FRAME_CONTEXT_EDGE_TOP;
+    else if (!g_ascii_strcasecmp("ScreenTopRight", name))
+        return OB_FRAME_CONTEXT_EDGE_TOPRIGHT;
+    else if (!g_ascii_strcasecmp("ScreenRight", name))
+        return OB_FRAME_CONTEXT_EDGE_RIGHT;
+    else if (!g_ascii_strcasecmp("ScreenBottomRight", name))
+        return OB_FRAME_CONTEXT_EDGE_BOTTOMRIGHT;
+    else if (!g_ascii_strcasecmp("ScreenBottom", name))
+        return OB_FRAME_CONTEXT_EDGE_BOTTOM;
+    else if (!g_ascii_strcasecmp("ScreenBottomLeft", name))
+        return OB_FRAME_CONTEXT_EDGE_BOTTOMLEFT;
+    else if (!g_ascii_strcasecmp("ScreenLeft", name))
+        return OB_FRAME_CONTEXT_EDGE_LEFT;
+    else if (!g_ascii_strcasecmp("ScreenTopLeft", name))
+        return OB_FRAME_CONTEXT_EDGE_TOPLEFT;
 
     return OB_FRAME_CONTEXT_NONE;
 }
@@ -1397,12 +1464,14 @@ ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
 
     if (moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
-
     if (win == obt_root(ob_screen))
         return OB_FRAME_CONTEXT_ROOT;
     if ((obwin = window_find(win))) {
         if (WINDOW_IS_DOCK(obwin)) {
           return OB_FRAME_CONTEXT_DOCK;
+        } else if (WINDOW_IS_EDGE(obwin)) {
+          ObEdge *edge = (ObEdge *)obwin;
+          return OB_FRAME_CONTEXT_EDGE_TOP + edge->location;
         }
     }
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
@@ -1865,7 +1934,7 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
                                FRAME_ANIMATE_ICONIFY_STEP_TIME,
                                frame_animate_iconify, self,
                                frame_end_iconify_animation);
-                               
+
 
         /* do the first step */
         frame_animate_iconify(self);

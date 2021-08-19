@@ -1,3 +1,14 @@
+3.7-n:
+  * cloned mikatchus work in progress branch with current features
+  * applied debian collection of openbox patches
+  * applied openbox-3.6.2-radius.patch (rounded corners)
+  * patched out hardcoded fullscreen legacy feature (which broke things)
+  * updated makedeb to again create a working debian package
+  * added simple wrapper scripts for building / auto install of .deb pkg
+
+3.7:
+  * Update translations
+
 3.6.1:
   * Bump ABI version of libobrender that should have been done in 3.6
 

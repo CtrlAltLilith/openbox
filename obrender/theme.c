@@ -22,7 +22,11 @@
 #include "font.h"
 #include "mask.h"
 #include "theme.h"
-#include "icon.h"
+#ifdef MIKACHU
+# include "icon-mikamika.h"
+#else
+# include "icon.h"
+#endif
 #include "obt/paths.h"
 
 #include <X11/Xlib.h>
@@ -961,8 +965,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
         RrMargins(theme->a_focused_label, &fl, &ft, &fr, &fb);
         RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
-        theme->label_height = theme->win_font_height + MAX(ft + fb, ut + ub);
-        theme->label_height += theme->label_height % 2;
+        theme->label_height = theme->win_font_height + MAX(ft + fb, ut + ub) + 1;
 
         /* this would be nice I think, since padding.width can now be 0,
            but it breaks frame.c horribly and I don't feel like fixing that
@@ -1494,8 +1497,10 @@ static void read_button_styles(XrmDatabase db, const RrInstance *inst,
     READ_BUTTON_MASK_COPY(disabled, btn->unpressed_mask);
     READ_BUTTON_MASK_COPY(hover, btn->unpressed_mask);
     if (toggled_mask) {
-        READ_BUTTON_MASK_COPY(pressed_toggled, btn->unpressed_toggled_mask);
-        READ_BUTTON_MASK_COPY(hover_toggled, btn->unpressed_toggled_mask);
+        g_snprintf(name, 128, "%s_toggled_pressed.xbm", btnname);
+        READ_MASK_COPY(name, btn->pressed_toggled_mask, btn->unpressed_toggled_mask);
+        g_snprintf(name, 128, "%s_toggled_hover.xbm", btnname);
+        READ_MASK_COPY(name, btn->hover_toggled_mask, btn->unpressed_toggled_mask);
     }
 
 #define READ_BUTTON_APPEARANCE(typedots, type, fallback) \
@@ -1532,8 +1537,8 @@ static void read_button_styles(XrmDatabase db, const RrInstance *inst,
     READ_BUTTON_APPEARANCE("disabled", disabled, 0);
     READ_BUTTON_APPEARANCE("hover", hover, 0);
     if (toggled_mask) {
-        READ_BUTTON_APPEARANCE("unpressed.toggled", unpressed_toggled, 1);
-        READ_BUTTON_APPEARANCE("pressed.toggled", pressed_toggled, 0);
-        READ_BUTTON_APPEARANCE("hover.toggled", hover_toggled, 0);
+        READ_BUTTON_APPEARANCE("toggled.unpressed", unpressed_toggled, 1);
+        READ_BUTTON_APPEARANCE("toggled.pressed", pressed_toggled, 0);
+        READ_BUTTON_APPEARANCE("toggled.hover", hover_toggled, 0);
     }
 }

@@ -12,8 +12,8 @@ to save your state from one log in to the next.
 arguments. 
 .PP 
 On log in, \fBopenbox-session\fR will run the 
-~/.config/openbox/autostart.sh script if it exists, and will run the 
-system-wide script @configdir@/openbox/autostart.sh otherwise. You may 
+~/.config/openbox/autostart script if it exists, and will run the 
+system-wide script @configdir@/openbox/autostart otherwise. You may 
 place anything you want to run automatically in those files, for example: 
  
 .PP 
@@ -27,7 +27,7 @@ gnome-settings-daemon &
 .PP 
 Make sure that each line is followed by a "&" or else the script will 
 stop there and further commands will not be executed. You can use the 
-@configdir@/openbox/autostart.sh file as an example for creating your 
+@configdir@/openbox/autostart file as an example for creating your 
 own. 
 .SH "SEE ALSO" 
 .PP 

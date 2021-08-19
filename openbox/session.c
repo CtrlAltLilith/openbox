@@ -442,7 +442,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
     free(vendor);
 
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
-        ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed");
+        ob_debug_type(OB_DEBUG_SM, "Request for phase 2 failed");
         g_slice_free(ObSMSaveData, savedata);
         SmcSaveYourselfDone(conn, FALSE);
     }
