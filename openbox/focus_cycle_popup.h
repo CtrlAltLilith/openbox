@@ -34,7 +34,7 @@ void focus_cycle_popup_startup(gboolean reconfig);
 void focus_cycle_popup_shutdown(gboolean reconfig);
 
 void focus_cycle_popup_show(struct _ObClient *c, ObFocusCyclePopupMode mode,
-                            gboolean linear);
+                            gboolean linear, guint monitor);
 void focus_cycle_popup_hide(void);
 
 void focus_cycle_popup_single_show(struct _ObClient *c);

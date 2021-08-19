@@ -136,8 +136,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            3. it is not shaded
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            focus_valid_target(c, screen_desktop,
-                               TRUE, FALSE, FALSE, TRUE, FALSE, FALSE,
+            focus_valid_target(c, screen_desktop, 0,
+                               TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
                                FALSE) &&
             !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
@@ -158,8 +158,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_valid_target(c, screen_desktop,
-                               TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE) &&
+        if (focus_valid_target(c, screen_desktop, 0,
+                               TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -279,8 +279,10 @@ ObClient *focus_order_find_first(guint desktop)
 /*! Returns if a focus target has valid group siblings that can be cycled
   to in its place */
 static gboolean focus_target_has_siblings(ObClient *ft,
+                                          guint    monitor,
                                           gboolean iconic_windows,
-                                          gboolean all_desktops)
+                                          gboolean all_desktops,
+                                          gboolean all_monitors)
 
 {
     GSList *it;
@@ -291,9 +293,9 @@ static gboolean focus_target_has_siblings(ObClient *ft,
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
-            focus_valid_target(c, screen_desktop,
+            focus_valid_target(c, screen_desktop, monitor,
                                TRUE, iconic_windows, all_desktops,
-                               TRUE, FALSE, FALSE, FALSE))
+                               all_monitors, TRUE, FALSE, FALSE, FALSE))
         {
             return TRUE;
         }
@@ -303,9 +305,11 @@ static gboolean focus_target_has_siblings(ObClient *ft,
 
 gboolean focus_valid_target(ObClient *ft,
                             guint    desktop,
+                            guint    monitor,
                             gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
+                            gboolean all_monitors,
                             gboolean nonhilite_windows,
                             gboolean dock_windows,
                             gboolean desktop_windows,
@@ -355,7 +359,7 @@ gboolean focus_valid_target(ObClient *ft,
                 helper_windows) ||
                /* ... or if there are no other windows in its group
                   that can be focused instead */
-               !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
+               !focus_target_has_siblings(ft, monitor, iconic_windows, all_desktops, all_monitors))));
 
     /* it's not set to skip the taskbar (but this is overridden if the
        window is modal or if the user asked for this window to be focused,
@@ -369,6 +373,9 @@ gboolean focus_valid_target(ObClient *ft,
                  ft->demands_attention ||
                  ft->type == OB_CLIENT_TYPE_DIALOG));
 
+    /* compare client's monitor to current active monitor */
+    ok = ok && (all_monitors || ft->monitor == monitor);
+
     /* it's not going to just send focus off somewhere else (modal window),
        unless that modal window is not one of our valid targets, then let
        you choose this window and bring the modal one here */
@@ -376,9 +383,11 @@ gboolean focus_valid_target(ObClient *ft,
         ObClient *cft = client_focus_target(ft);
         ok = ok && (ft == cft || !focus_valid_target(cft,
                                                      screen_desktop,
+                                                     monitor,
                                                      TRUE,
                                                      iconic_windows,
                                                      all_desktops,
+                                                     all_monitors,
                                                      nonhilite_windows,
                                                      dock_windows,
                                                      desktop_windows,

@@ -92,6 +92,7 @@ struct _ObFocusCyclePopup
 
     gboolean mapped;
     ObFocusCyclePopupMode mode;
+    guint monitor;
 };
 
 /*! This popup shows all possible windows */
@@ -421,7 +422,11 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     g_assert(mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
              mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
 
-    screen_area = screen_physical_area_primary(FALSE);
+    if (p->monitor == screen_num_monitors) {
+        screen_area = screen_physical_area_primary(FALSE);
+    } else {
+        screen_area = screen_physical_area_monitor(p->monitor);
+    }
 
     /* get the outside margins */
     RrMargins(p->a_bg, &ml, &mt, &mr, &mb);
@@ -705,7 +710,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 }
 
 void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
-                            gboolean linear)
+                            gboolean linear, guint monitor)
 {
     g_assert(c != NULL);
 
@@ -719,6 +724,7 @@ void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
         popup_setup(&popup, TRUE, FALSE, linear);
         /* this is fixed once the dialog is shown */
         popup.mode = mode;
+        popup.monitor = monitor;
     }
     g_assert(popup.targets != NULL);
 

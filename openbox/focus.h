@@ -70,9 +70,11 @@ struct _ObClient *focus_order_find_first(guint desktop);
 
 gboolean focus_valid_target(struct _ObClient *ft,
                             guint    desktop,
+                            guint    monitor,
                             gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
+                            gboolean all_monitors,
                             gboolean nonhilite_windows,
                             gboolean dock_windows,
                             gboolean desktop_windows,

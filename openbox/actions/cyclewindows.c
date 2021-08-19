@@ -13,6 +13,7 @@ typedef struct {
     gboolean desktop_windows;
     gboolean only_hilite_windows;
     gboolean all_desktops;
+    gboolean all_monitors;
     gboolean forward;
     gboolean bar;
     gboolean raise;
@@ -71,6 +72,7 @@ static gpointer setup_func(xmlNodePtr node,
     o->bar = TRUE;
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
     o->interactive = TRUE;
+    o->all_monitors = TRUE;
 
     if ((n = obt_xml_find_node(node, "linear")))
         o->linear = obt_xml_node_bool(n);
@@ -96,6 +98,8 @@ static gpointer setup_func(xmlNodePtr node,
         o->desktop_windows = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "allDesktops")))
         o->all_desktops = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "allMonitors")))
+        o->all_monitors = obt_xml_node_bool(n);
 
     if ((n = obt_xml_find_node(node, "finalactions"))) {
         xmlNodePtr m;
@@ -167,6 +171,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     ft = focus_cycle(
         o->forward,
         o->all_desktops,
+        o->all_monitors,
         !o->only_hilite_windows,
         o->dock_windows,
         o->desktop_windows,
@@ -242,6 +247,7 @@ static void i_post_func(gpointer options)
 
     ft = focus_cycle(o->forward,
                      o->all_desktops,
+                     o->all_monitors,
                      !o->only_hilite_windows,
                      o->dock_windows,
                      o->desktop_windows,

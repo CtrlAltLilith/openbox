@@ -103,6 +103,8 @@ struct _ObClient
     /*! The desktop on which the window resides (0xffffffff for all
       desktops) */
     guint desktop;
+    /*! The monitor where the window currently resides */
+    guint monitor;
 
     /*! The startup id for the startup-notification protocol. This will be
       NULL if a startup id is not set. */

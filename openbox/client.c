@@ -242,6 +242,7 @@ void client_manage(Window window, ObPrompt *prompt)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
+    self->monitor = screen_num_monitors; /* always an invalid value */
 
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
@@ -324,8 +325,8 @@ void client_manage(Window window, ObPrompt *prompt)
         (user_time != 0) &&
         /* this checks for focus=false for the window */
         settings->focus != 0 &&
-        focus_valid_target(self, self->desktop,
-                           FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+        focus_valid_target(self, self->desktop, 0,
+                           FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
     {
         try_activate = TRUE;
@@ -582,7 +583,6 @@ void client_unmanage_all(void)
 void client_unmanage(ObClient *self)
 {
     GSList *it;
-    gulong ignore_start;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
              self->window, self->frame->window,
@@ -594,16 +594,9 @@ void client_unmanage(ObClient *self)
        don't generate more events */
     XSelectInput(obt_display, self->window, NoEventMask);
 
-    /* ignore enter events from the unmap so it doesnt mess with the focus */
-    if (!config_focus_under_mouse)
-        ignore_start = event_start_ignore_all_enters();
-
     frame_hide(self->frame);
     /* flush to send the hide to the server quickly */
     XFlush(obt_display);
-
-    if (!config_focus_under_mouse)
-        event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
 
@@ -3337,13 +3330,26 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        watch out tho, don't try change stacking stuff if the window is no
        longer being managed !
     */
-    if (self->managed &&
-        (screen_find_monitor(&self->frame->area) !=
-         screen_find_monitor(&oldframe) ||
-         (final && (client_is_oldfullscreen(self, &oldclient) !=
-                    client_is_oldfullscreen(self, &self->area)))))
+    if (self->managed)
     {
-        client_calc_layer(self);
+        guint i;
+        gboolean monitorchanged;
+
+        i = screen_find_monitor(&self->frame->area);
+        monitorchanged = self->monitor != i;
+
+        if (monitorchanged) {
+            self->monitor = i;
+            focus_cycle_addremove(self, TRUE);
+            ob_debug("Window %s is now on monitor %d",
+                     self->title, self->monitor);
+        }
+        if (monitorchanged ||
+            (final && (client_is_oldfullscreen(self, &oldclient) !=
+                       client_is_oldfullscreen(self, &self->area))))
+        {
+            client_calc_layer(self);
+        }
     }
 }
 
@@ -4256,7 +4262,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 
 guint client_monitor(ObClient *self)
 {
-    return screen_find_monitor(&self->frame->area);
+    return self->monitor;
 }
 
 ObClient *client_direct_parent(ObClient *self)
