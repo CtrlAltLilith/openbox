@@ -1,5 +1,6 @@
 # Fork Features 
-* rounded corners with configurable bottom. (JJMorton)
+* rounded corners with configurable bottom. (JJMorton) `<cornerRadius>8</cornerRadius>` 
+
 
 Argument description | Example
 ------------ | -------------
@@ -7,7 +8,12 @@ Enable rounded corners on menus | menu="yes"
 Enable rounded corners on window bottom | bottom="yes"
 
 * HJKL motion keys (mstuehn) 
+* Allow changing debug mode on the fly on a running wm (paulie-g)
 * Window snapping (emilypeto)
+* utf8 unicode support for menu accelerators (paulie-g)
+
+>Must be enabled `<utf8Enabled>yes</utf8Enabled>` and `<utf8AllowGraph>no</utf8AllowGraph>`
+
 * Scripts updated to Python 3 (troycurtisjr)
 * Added allMonitors option to NextWindow and PreviousWindow (yut23)
 >Enabled by default for backwards compatibility.
@@ -19,8 +25,11 @@ another monitor.
 >To implement this efficiently, I have each client keep track of their
 current monitor. This may need more extensive testing to make sure it
 doesn't miss any movement methods. ~ Yut23 commit
+## Bug fixes
 * Compiler deprication warning fixes (yut23)
 * 2018 Debian fixes by photon
+* Fix: bug #6362: desktop window may be set to skip the taskbar - they usually are (paulie-g)
+
 # Openbox
 
 Copyright (C) 2004  Mikael Magnusson
