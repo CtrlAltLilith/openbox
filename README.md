@@ -9,7 +9,7 @@ Enable rounded corners on window bottom | bottom="yes"
 * HJKL motion keys (mstuehn) 
 * Window snapping (emilypeto)
 * Scripts updated to Python 3 (troycurtisjr)
-* <allMonitors> option to NextWindow and PreviousWindow (yut23)
+* Added allMonitors option to NextWindow and PreviousWindow (yut23)
 >Enabled by default for backwards compatibility.
 If disabled, the window switcher will only show windows from the current
 monitor (for now, that's where the pointer is). The popup will stay on
