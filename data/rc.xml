@@ -61,6 +61,14 @@
       S: shade (roll up/down)
       D: omnipresent (on all desktops).
   -->
+  <!-- Round Corners
+  
+  Other options: 
+  menu="yes"
+  bottom="yes"
+ --> 
+  <cornerRadius>8</cornerRadius>
+
   <keepBorder>yes</keepBorder>
   <animateIconify>yes</animateIconify>
   <font place="ActiveWindow">
@@ -647,11 +655,11 @@
        entry in parent menu
        if this is a negative value, then the delay is infinite and the
        submenu will not be hidden until a different submenu is opened -->
-  <utf8Enabled>no</utf8Enabled>
+  <utf8Enabled>yes</utf8Enabled>
   <!-- set to 'yes' to enable utf8 (unicode) support for menu shortcuts
        this includes automatic selection of first suitable character and
        manual setting with a prepended underscore -->
-  <utf8AllowGraph>no</utf8AllowGraph>
+  <utf8AllowGraph>yes</utf8AllowGraph>
   <!-- set to 'yes' (utf8Enabled must also be set to 'yes') to allow the use of
        any printable utf8 (unicode) character as a menu shortcut
        by default ('no'), shortcuts are restricted to alphanumeric characters -->

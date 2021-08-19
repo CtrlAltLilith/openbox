@@ -593,11 +593,11 @@ dist_noinst_DATA = \
 	tests/urgent.c
 
 dist_doc_DATA = \
-	COMPLIANCE \
-	README \
-	AUTHORS \
-	CHANGELOG \
-	COPYING \
+	info/COMPLIANCE \
+	info/README \
+	info/AUTHORS \
+	info/CHANGELOG \
+	info/COPYING \
 	data/rc.xsd \
 	data/menu.xsd \
 	doc/rc-mouse-focus.xml
