@@ -27,7 +27,7 @@ Stops the entire process group including processes spawned by it | group
 * Cycle through the windows with the arrow keys (M374LX)
 * utf8 unicode support for menu accelerators (paulie-g)
 
->Must be enabled `<utf8Enabled>yes</utf8Enabled>` and `<utf8AllowGraph>no</utf8AllowGraph>`
+>Must be enabled `<utf8Enabled>yes</utf8Enabled>` and `<utf8AllowGraph>yes</utf8AllowGraph>`
 
 * Scripts updated to Python 3 (troycurtisjr)
 * Added allMonitors option to NextWindow and PreviousWindow (yut23)
