@@ -11,12 +11,27 @@ Argument description | Example
 Enable rounded corners on menus | menu="yes"
 Enable rounded corners on window bottom | bottom="yes"
 
+* Stop Hidden (Vitaly Minko) 
+`
+  <application class="Firefox">
+    <stop_hidden>group</stop_hidden>
+  </application>
+` 
+
+Value description | Example
+------------ | -------------
+do not stop application when it hides (default value) | no
+stop just the process the hidden window belongs to | process
+Stops the entire process group including processes spawned by it | group
+
+
 * HJKL motion keys (mstuehn) 
 * Allow changing debug mode on the fly on a running wm (paulie-g)
 * Window snapping (emilypeto)
+* Cycle through the windows with the arrow keys (M374LX)
 * utf8 unicode support for menu accelerators (paulie-g)
 
->Must be enabled `<utf8Enabled>yes</utf8Enabled>` and `<utf8AllowGraph>no</utf8AllowGraph>`
+>Must be enabled `<utf8Enabled>yes</utf8Enabled>` and `<utf8AllowGraph>yes</utf8AllowGraph>`
 
 * Scripts updated to Python 3 (troycurtisjr)
 * Added allMonitors option to NextWindow and PreviousWindow (yut23)
@@ -33,6 +48,7 @@ doesn't miss any movement methods. ~ Yut23 commit
 * Compiler deprication warning fixes (yut23)
 * 2018 Debian fixes by photon
 * Fix: bug #6362: desktop window may be set to skip the taskbar - they usually are (paulie-g)
+* Fix loosing focus while moving windows (Andrey Dotsenko)
 
 # Openbox
 
