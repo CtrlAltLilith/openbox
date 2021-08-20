@@ -383,82 +383,34 @@ dist_docxbm_DATA = \
 
 ## themes ##
 
-clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
-dist_clearlooks_theme_DATA= \
-	themes/Clearlooks/openbox-3/themerc
+box_themedir = $(themedir)/box/openbox-3
+dist_box_theme_DATA= \
+	themes/box/openbox-3/bullet.xbm \
+	themes/box/openbox-3/close.xbm \
+	themes/box/openbox-3/desk_toggled.xbm \
+	themes/box/openbox-3/desk.xbm \
+	themes/box/openbox-3/iconify.xbm \
+	themes/box/openbox-3/max_disabled.xbm \
+	themes/box/openbox-3/max_toggled.xbm \
+	themes/box/openbox-3/max.xbm \
+	themes/box/openbox-3/shade_toggled.xbm \
+	themes/box/openbox-3/shade.xbm \
+	themes/box/openbox-3/themerc
 
-clearlooks34_themedir = $(themedir)/Clearlooks-3.4/openbox-3
-dist_clearlooks34_theme_DATA= \
-	themes/Clearlooks-3.4/openbox-3/themerc
+joy_themedir = $(themedir)/joy/openbox-3
+dist_joy_theme_DATA= \
+	themes/joy/openbox-3/bullet.xbm \
+	themes/joy/openbox-3/close.xbm \
+	themes/joy/openbox-3/desk_toggled.xbm \
+	themes/joy/openbox-3/desk.xbm \
+	themes/joy/openbox-3/iconify.xbm \
+	themes/joy/openbox-3/max_disabled.xbm \
+	themes/joy/openbox-3/max_toggled.xbm \
+	themes/joy/openbox-3/max.xbm \
+	themes/joy/openbox-3/shade_toggled.xbm \
+	themes/joy/openbox-3/shade.xbm \
+	themes/joy/openbox-3/themerc
 
-clearlooksolive_themedir = $(themedir)/Clearlooks-Olive/openbox-3
-dist_clearlooksolive_theme_DATA= \
-	themes/Clearlooks-Olive/openbox-3/themerc
-
-mikachu_themedir = $(themedir)/Mikachu/openbox-3
-dist_mikachu_theme_DATA= \
-	themes/Mikachu/openbox-3/bullet.xbm \
-	themes/Mikachu/openbox-3/close.xbm \
-	themes/Mikachu/openbox-3/desk.xbm \
-	themes/Mikachu/openbox-3/iconify.xbm \
-	themes/Mikachu/openbox-3/max.xbm \
-	themes/Mikachu/openbox-3/themerc
-
-
-natura_themedir = $(themedir)/Natura/openbox-3
-dist_natura_theme_DATA= \
-	themes/Natura/openbox-3/close_hover.xbm \
-	themes/Natura/openbox-3/close.xbm \
-	themes/Natura/openbox-3/desk_toggled.xbm \
-	themes/Natura/openbox-3/desk_hover.xbm \
-	themes/Natura/openbox-3/desk.xbm \
-	themes/Natura/openbox-3/iconify_hover.xbm \
-	themes/Natura/openbox-3/iconify.xbm \
-	themes/Natura/openbox-3/max_hover.xbm \
-	themes/Natura/openbox-3/max_toggled.xbm \
-	themes/Natura/openbox-3/max.xbm \
-	themes/Natura/openbox-3/shade.xbm \
-	themes/Natura/openbox-3/shade_hover.xbm \
-	themes/Natura/openbox-3/themerc
-
-artwizboxed_themedir = $(themedir)/Artwiz-boxed/openbox-3
-dist_artwizboxed_theme_DATA= \
-	themes/Artwiz-boxed/openbox-3/themerc
-
-bear2_themedir = $(themedir)/Bear2/openbox-3
-dist_bear2_theme_DATA= \
-	themes/Bear2/openbox-3/close_pressed.xbm \
-	themes/Bear2/openbox-3/close.xbm \
-	themes/Bear2/openbox-3/desk_toggled.xbm \
-	themes/Bear2/openbox-3/desk.xbm \
-	themes/Bear2/openbox-3/iconify_pressed.xbm \
-	themes/Bear2/openbox-3/iconify.xbm \
-	themes/Bear2/openbox-3/max_pressed.xbm \
-	themes/Bear2/openbox-3/max_toggled.xbm \
-	themes/Bear2/openbox-3/max.xbm \
-	themes/Bear2/openbox-3/shade_pressed.xbm \
-	themes/Bear2/openbox-3/shade.xbm \
-	themes/Bear2/openbox-3/themerc
-
-orang_themedir = $(themedir)/Orang/openbox-3
-dist_orang_theme_DATA= \
-	themes/Orang/openbox-3/themerc
-
-onyx_themedir = $(themedir)/Onyx/openbox-3
-dist_onyx_theme_DATA= \
-	themes/Onyx/openbox-3/themerc
-
-onyxcitrus_themedir = $(themedir)/Onyx-Citrus/openbox-3
-dist_onyxcitrus_theme_DATA= \
-	themes/Onyx-Citrus/openbox-3/themerc
-
-syscrash_themedir = $(themedir)/Syscrash/openbox-3
-dist_syscrash_theme_DATA= \
-	themes/Syscrash/openbox-3/max_disabled.xbm \
-	themes/Syscrash/openbox-3/max_pressed.xbm \
-	themes/Syscrash/openbox-3/max_toggled.xbm \
-	themes/Syscrash/openbox-3/max.xbm \
-	themes/Syscrash/openbox-3/themerc
 
 ## public headers ##
 

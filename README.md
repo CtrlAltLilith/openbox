@@ -1,4 +1,8 @@
 # Fork Features 
+![Screenshot](info/screenshot.png)
+
+
+* Removed default themes and replaced with Joy and Box by [owl4ce](https://github.com/owl4ce/yao)
 * rounded corners with configurable bottom. (JJMorton) `<cornerRadius>8</cornerRadius>` 
 
 
