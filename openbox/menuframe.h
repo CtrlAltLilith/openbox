@@ -87,6 +87,10 @@ struct _ObMenuFrame
     gboolean press_doexec; /* if the upcoming KeyRelease should be used to
                               execute the menu item that was selected by the
                               KeyPress */
+   GThread *thread;
+    GMutex m;
+    GCond cond;
+    gboolean exit_thread;
 };
 
 struct _ObMenuEntryFrame
@@ -103,6 +107,9 @@ struct _ObMenuEntryFrame
     Window icon;
     Window text;
     Window bullet;
+
+    GMutex m;
+
 };
 
 extern GHashTable *menu_frame_map;

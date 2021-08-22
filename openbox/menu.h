@@ -34,6 +34,7 @@ typedef struct _ObMenuEntry ObMenuEntry;
 typedef struct _ObNormalMenuEntry ObNormalMenuEntry;
 typedef struct _ObSubmenuMenuEntry ObSubmenuMenuEntry;
 typedef struct _ObSeparatorMenuEntry ObSeparatorMenuEntry;
+typedef struct _ObLabel ObLabel;
 
 typedef void (*ObMenuShowFunc)(struct _ObMenuFrame *frame, gpointer data);
 typedef void (*ObMenuHideFunc)(struct _ObMenuFrame *frame, gpointer data);
@@ -58,7 +59,7 @@ struct _ObMenu
     /* Name of the menu. Used in the showmenu action. */
     gchar *name;
     /* Displayed title */
-    gchar *title;
+    ObLabel *label;
     gchar *collate_key;
     /*! The shortcut key that would be used to activate this menu if it was
       displayed as a submenu */
@@ -110,7 +111,6 @@ struct _ObNormalMenuEntry {
     RrImage *icon;
     gint     icon_alpha;
 
-    gchar *label;
     gchar *collate_key;
     /*! The shortcut key that would be used to activate this menu entry */
     gunichar shortcut;
@@ -147,7 +147,6 @@ struct _ObSubmenuMenuEntry {
 };
 
 struct _ObSeparatorMenuEntry {
-    gchar *label;
 };
 
 struct _ObMenuEntry
@@ -158,6 +157,9 @@ struct _ObMenuEntry
     ObMenu *menu;
 
     gint id;
+    
+    ObLabel *label;
+
 
     union u {
         ObNormalMenuEntry normal;
@@ -166,13 +168,20 @@ struct _ObMenuEntry
     } data;
 };
 
+struct _ObLabel
+{
+    gchar *text;
+    gchar *lexecute;
+};
+
+
 void menu_startup(gboolean reconfig);
 void menu_shutdown(gboolean reconfig);
 
 void menu_entry_ref(ObMenuEntry *self);
 void menu_entry_unref(ObMenuEntry *self);
 
-ObMenu* menu_new(const gchar *name, const gchar *title,
+ObMenu* menu_new(const gchar *name, const gchar *label, const gchar *lexecute,
                  gboolean allow_shortcut_selection, gpointer data);
 void menu_free(ObMenu *menu);
 
@@ -213,9 +222,12 @@ void menu_set_place_func(ObMenu *menu, ObMenuPlaceFunc func);
 /*! @param allow_shortcut this should be false when the label is coming from
            outside data like window or desktop titles */
 ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
+                             const gchar* lexecute,
+
                              GSList *actions, gboolean allow_shortcut);
 ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
-ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
+ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label,
+                                const gchar *lexecute);
 
 /*! This sorts groups of menu entries between consecutive separators */
 void menu_sort_entries(ObMenu *self);
@@ -224,7 +236,7 @@ void menu_clear_entries(ObMenu *self);
 void menu_entry_remove(ObMenuEntry *self);
 
 void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
-                          gboolean allow_shortcut);
+                          const gchar *lexecute, gboolean allow_shortcut);
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 
@@ -232,5 +244,7 @@ ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 void menu_find_submenus(ObMenu *self);
 
 ObMenuEntry* menu_get_more(ObMenu *menu, guint show_from);
+/* execute a menu entry's label's command, if set */
+gboolean menu_entry_label_execute(ObMenuEntry *self);
 
 #endif

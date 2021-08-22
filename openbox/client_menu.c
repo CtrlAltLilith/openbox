@@ -257,7 +257,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
             guint desk;
 
             if (i == screen_num_desktops) {
-                menu_add_separator(menu, -1, NULL);
+                menu_add_separator(menu, -1, NULL, NULL);
 
                 desk = DESKTOP_ALL;
                 name = _("All desktops");
@@ -266,7 +266,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
                 name = screen_desktop_names[i];
             }
 
-            e = menu_add_normal(menu, desk, name, NULL, FALSE);
+            e = menu_add_normal(menu, desk, name, NULL, NULL, FALSE);
             e->id = desk;
         }
     }
@@ -372,20 +372,18 @@ void client_menu_startup(void)
     ObMenu *menu;
     ObMenuEntry *e;
 
-    menu = menu_new(LAYER_MENU_NAME, _("_Layer"), TRUE, NULL);
+    menu = menu_new(LAYER_MENU_NAME, _("_Layer"), NULL, TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, layer_menu_update);
     menu_set_execute_func(menu, layer_menu_execute);
 
-    menu_add_normal(menu, LAYER_TOP, _("Always on _top"), NULL, TRUE);
-    menu_add_normal(menu, LAYER_NORMAL, _("_Normal"), NULL, TRUE);
-    menu_add_normal(menu, LAYER_BOTTOM, _("Always on _bottom"),NULL, TRUE);
-
-    menu = menu_new(SEND_TO_MENU_NAME, _("_Send to desktop"), TRUE, NULL);
-    menu_set_update_func(menu, send_to_menu_update);
+    menu_add_normal(menu, LAYER_TOP, _("Always on _top"), NULL, NULL, TRUE);
+    menu_add_normal(menu, LAYER_NORMAL, _("_Normal"), NULL, NULL, TRUE);
+    menu_add_normal(menu, LAYER_BOTTOM, _("Always on _bottom"), NULL, NULL, TRUE);
+    menu = menu_new(SEND_TO_MENU_NAME, _("_Send to desktop"), NULL, TRUE, NULL);    menu_set_update_func(menu, send_to_menu_update);
     menu_set_execute_func(menu, send_to_menu_execute);
 
-    menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);
+    menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL, TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, client_menu_update);
     menu_set_place_func(menu, client_menu_place);
@@ -395,33 +393,31 @@ void client_menu_startup(void)
 
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
-    e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->btn_max->unpressed_toggled_mask;
     set_icon_color(e);
 
-    menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, TRUE);
+    menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, NULL, TRUE);
 
-    menu_add_normal(menu, CLIENT_RESIZE, _("Resi_ze"), NULL, TRUE);
-
-    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_iconify->unpressed_mask;
+    menu_add_normal(menu, CLIENT_RESIZE, _("Resi_ze"), NULL, NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, NULL, TRUE);    e->data.normal.mask = ob_rr_theme->btn_iconify->unpressed_mask;
     set_icon_color(e);
 
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->btn_max->unpressed_mask;
     set_icon_color(e);
 
-    e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
+ e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->btn_shade->unpressed_mask;
     set_icon_color(e);
 
-    menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, TRUE);
+     menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, NULL, TRUE);
 
-    menu_add_separator(menu, -1, NULL);
+    menu_add_separator(menu, -1, NULL, NULL);
     menu_add_submenu(menu, 0, "client-list-menu");
-    menu_add_separator(menu, -1, NULL);
+    menu_add_separator(menu, -1, NULL, NULL);
 
-    e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->btn_close->unpressed_mask;
     set_icon_color(e);
 }

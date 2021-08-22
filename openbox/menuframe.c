@@ -49,6 +49,8 @@ static RrAppearance *a_sep;
 static guint submenu_show_timer = 0;
 static guint submenu_hide_timer = 0;
 
+static GMutex menu_entry_frame_render_mutex;
+
 static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
@@ -57,6 +59,9 @@ static gboolean submenu_show_timeout(gpointer data);
 static void menu_frame_hide(ObMenuFrame *self);
 
 static gboolean submenu_hide_timeout(gpointer data);
+
+static gpointer menu_entry_frame_update_thread(ObMenuFrame *self);
+
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -136,6 +141,9 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 
     window_add(&self->window, MENUFRAME_AS_WINDOW(self));
     stacking_add(MENUFRAME_AS_WINDOW(self));
+    self->thread = NULL;
+    g_mutex_init(&self->m);
+    g_cond_init(&self->cond);
 
     return self;
 }
@@ -143,6 +151,11 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 void menu_frame_free(ObMenuFrame *self)
 {
     if (self) {
+
+        //if (self->thread)
+            //g_thread_unref(self->thread);
+        g_mutex_clear(&self->m);
+        g_cond_clear(&self->cond);
         while (self->entries) {
             menu_entry_frame_free(self->entries->data);
             self->entries = g_list_delete_link(self->entries, self->entries);
@@ -197,6 +210,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     XMapWindow(obt_display, self->text);
 
     window_add(&self->window, MENUFRAME_AS_WINDOW(self->frame));
+        g_mutex_init(&self->m);
+
 
     return self;
 }
@@ -219,6 +234,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
             XDestroyWindow(obt_display, self->bullet);
             g_hash_table_remove(menu_frame_map, &self->bullet);
         }
+        g_mutex_clear(&self->m);
 
         menu_entry_unref(self->entry);
         g_slice_free(ObMenuEntryFrame, self);
@@ -355,6 +371,8 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
 
 static void menu_entry_frame_render(ObMenuEntryFrame *self)
 {
+        g_mutex_lock(&menu_entry_frame_render_mutex);
+
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
     ObMenu *sub;
@@ -376,7 +394,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         th = ITEM_HEIGHT;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label) {
+        if (self->entry->label->text) {
             item_a = ob_rr_theme->a_menu_title;
             th = ob_rr_theme->menu_title_height;
         } else {
@@ -409,7 +427,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   (self == self->frame->selected ?
                    ob_rr_theme->a_menu_text_selected :
                    ob_rr_theme->a_menu_text_normal));
-        text_a->texture[0].data.text.string = self->entry->data.normal.label;
+        text_a->texture[0].data.text.string = self->entry->label->text;
         if (self->entry->data.normal.shortcut &&
             (self->frame->menu->show_all_shortcuts ||
              self->entry->data.normal.shortcut_always_show ||
@@ -426,7 +444,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   ob_rr_theme->a_menu_text_selected :
                   ob_rr_theme->a_menu_text_normal);
         sub = self->entry->data.submenu.submenu;
-        text_a->texture[0].data.text.string = sub ? sub->title : "";
+        text_a->texture[0].data.text.string = sub ? sub->label->text : "";
         if (sub && sub->shortcut && (self->frame->menu->show_all_shortcuts ||
                               sub->shortcut_always_show ||
                               sub->shortcut_position > 0))
@@ -437,10 +455,10 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
             text_a->texture[0].data.text.shortcut = FALSE;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label != NULL) {
+        if (self->entry->label->text != NULL) {
             text_a = ob_rr_theme->a_menu_text_title;
             text_a->texture[0].data.text.string =
-                self->entry->data.separator.label;
+                self->entry->label->text;
         }
         else
             text_a = ob_rr_theme->a_menu_text_normal;
@@ -473,7 +491,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 ITEM_HEIGHT - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label != NULL) {
+        if (self->entry->label->text != NULL) {
             /* labeled separator */
             XMoveResizeWindow(obt_display, self->text,
                               ob_rr_theme->paddingx, ob_rr_theme->paddingy,
@@ -613,6 +631,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         XUnmapWindow(obt_display, self->bullet);
 
     XFlush(obt_display);
+        g_mutex_unlock(&menu_entry_frame_render_mutex);
+
 }
 
 /*! this code is taken from the menu_frame_render. if that changes, this won't
@@ -638,7 +658,7 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
         h += ob_rr_theme->menu_font_height;
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        if (self->entry->data.separator.label != NULL) {
+        if (self->entry->label->text != NULL) {
             h += ob_rr_theme->menu_title_height +
                 (ob_rr_theme->mbwidth - PADDING) * 2;
 
@@ -719,13 +739,13 @@ void menu_frame_render(ObMenuFrame *self)
            overlap with the menu's outside border */
         if (it == self->entries &&
             e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
-            e->entry->data.separator.label)
+            e->entry->label->text)
         {
             h -= ob_rr_theme->mbwidth;
         }
 
         if (e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
-            e->entry->data.separator.label)
+            e->entry->label->text)
         {
             e->border = ob_rr_theme->mbwidth;
         }
@@ -749,7 +769,7 @@ void menu_frame_render(ObMenuFrame *self)
                    ob_rr_theme->a_menu_text_normal));
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
-            text_a->texture[0].data.text.string = e->entry->data.normal.label;
+            text_a->texture[0].data.text.string = e->entry->label->text;
             tw = RrMinWidth(text_a);
             tw = MIN(tw, MAX_MENU_WIDTH);
             th = ob_rr_theme->menu_font_height;
@@ -760,7 +780,7 @@ void menu_frame_render(ObMenuFrame *self)
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;
-            text_a->texture[0].data.text.string = sub ? sub->title : "";
+            text_a->texture[0].data.text.string = sub ? sub->label->text : "";
             tw = RrMinWidth(text_a);
             tw = MIN(tw, MAX_MENU_WIDTH);
             th = ob_rr_theme->menu_font_height;
@@ -772,9 +792,9 @@ void menu_frame_render(ObMenuFrame *self)
             tw += ITEM_HEIGHT - PADDING;
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
-            if (e->entry->data.separator.label != NULL) {
+            if (e->entry->label->text != NULL) {
                 ob_rr_theme->a_menu_text_title->texture[0].data.text.string =
-                    e->entry->data.separator.label;
+                    e->entry->label->text;
                 tw = RrMinWidth(ob_rr_theme->a_menu_text_title) +
                     2*ob_rr_theme->paddingx;
                 tw = MIN(tw, MAX_MENU_WIDTH);
@@ -802,7 +822,7 @@ void menu_frame_render(ObMenuFrame *self)
     it = g_list_last(self->entries);
     e = it ? it->data : NULL;
     if (e && e->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR &&
-        e->entry->data.separator.label)
+        e->entry->label->text)
     {
         h -= ob_rr_theme->mbwidth;
     }
@@ -852,6 +872,13 @@ static void menu_frame_update(ObMenuFrame *self)
 
     /* start at show_from */
     mit = g_list_nth(self->menu->entries, self->show_from);
+    /* execute labels, if any */
+    GList *miter = mit;
+    while (miter)
+    {
+        menu_entry_label_execute(miter->data);
+        miter = g_list_next(miter);
+    }
 
     /* go through the menu's and frame's entries and connect the frame entries
        to the menu entries */
@@ -984,6 +1011,18 @@ static gboolean menu_frame_show(ObMenuFrame *self)
     if (self->menu->show_func)
         self->menu->show_func(self, self->menu->data);
 
+    // Start the thread
+    if (self->thread)
+    {
+        g_cond_signal(&self->cond);
+        g_thread_join(self->thread);
+        g_thread_unref(self->thread);
+    }
+    self->exit_thread = FALSE;
+    self->thread = g_thread_new(NULL,
+                                (GThreadFunc)menu_entry_frame_update_thread,
+                                self);
+
     return TRUE;
 }
 
@@ -1095,6 +1134,14 @@ static void menu_frame_hide(ObMenuFrame *self)
 
     if (!it)
         return;
+    if (self && self->thread)
+    {
+        g_mutex_lock(&self->m);
+        self->exit_thread = TRUE;
+        g_mutex_unlock(&self->m);
+        g_cond_signal(&self->cond);
+        g_thread_join(self->thread);
+    }
 
     if (menu->hide_func)
         menu->hide_func(self, menu->data);
@@ -1290,6 +1337,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     ObMenuFrame *f;
 
     if (!self->entry->data.submenu.submenu) return;
+    g_mutex_lock(&self->m);
 
     f = menu_frame_new(self->entry->data.submenu.submenu,
                        self->entry->data.submenu.show_from,
@@ -1299,6 +1347,8 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
 
     if (!menu_frame_show_submenu(f, self->frame, self))
         menu_frame_free(f);
+            g_mutex_unlock(&self->m);
+
 }
 
 void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
@@ -1354,7 +1404,47 @@ void menu_frame_select_previous(ObMenuFrame *self)
     }
     menu_frame_select(self, it ? it->data : NULL, FALSE);
 }
+gpointer menu_entry_frame_update_thread(ObMenuFrame *self)
+{
+    //g_thread_exit(0);
+    while (1) {
+        /* timeout, 1 second */
+        gint64 timeout = g_get_monotonic_time() + 1 * G_TIME_SPAN_SECOND;
+        g_mutex_lock(&self->m);
+        while(1) {
+            if (g_cond_wait_until(&self->cond, &self->m, timeout))  {
+                /* condition signalled, check exit boolean is set */
+                if (self->exit_thread) {
+                    g_mutex_unlock(&self->m);
+                    g_thread_exit(0);
+                }
+                else
+                {
+                    /* spurious or stolen wakeup, just continue the loop */
+                    continue;
+                }
+            }
+            else
+            {
+                /* timeout occured, break out of loop */
+                g_mutex_unlock(&self->m);
+                break;
+            }
+        }
 
+        /* render each menu frame entry again that requires it */
+        GList *it = NULL;
+        for (it = self->entries; it; it = g_list_next(it)) {
+            ObMenuEntryFrame *e = it->data;
+            g_mutex_lock(&e->m);
+            gboolean label_updated = menu_entry_label_execute(e->entry);
+            if (label_updated) {
+                menu_entry_frame_render(e);
+            }
+            g_mutex_unlock(&e->m);
+        }
+    }
+}
 void menu_frame_select_next(ObMenuFrame *self)
 {
     GList *it = NULL, *start;

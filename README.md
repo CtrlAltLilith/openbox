@@ -3,6 +3,10 @@
 
 
 * Removed default themes and replaced with Joy and Box by [owl4ce](https://github.com/owl4ce/yao)
+* lexecute (jwtrhs) `<separator lexecute="date +%T" \>`
+
+>Simply add a lexecute attribute to any tag in your menu.xml file that usually has a label tag. The value of the lexecute attribute should be a shell command or location of a script file (just like pipe menus), the results of which will take the place of the tag's original label.
+
 * rounded corners with configurable bottom. (JJMorton) `<cornerRadius>8</cornerRadius>` 
 
 

@@ -372,6 +372,7 @@
 </menu>
 
 <menu id="root-menu" label="Openbox 3">
+  <separator lexecute="date +%T" \>
   <separator label="Applications" />
   <menu id="apps-accessories-menu"/>
   <menu id="apps-editors-menu"/>
