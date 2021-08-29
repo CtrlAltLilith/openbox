@@ -1,7 +1,7 @@
 # Fork Features 
 ![Screenshot](info/screenshot.png)
 
-
+* More visible focus cycle indicator patch by [joaotavora](https://github.com/joaotavora/openbox/commit/55a73d9901fbac01268684fa352502ef65b59699)
 * Removed default themes and replaced with Joy and Box by [owl4ce](https://github.com/owl4ce/yao)
 * lexecute (jwtrhs) `<separator lexecute="date +%T" \>`
 

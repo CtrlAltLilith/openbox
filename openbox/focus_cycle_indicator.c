@@ -28,7 +28,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define FOCUS_INDICATOR_WIDTH 6
+#define FOCUS_INDICATOR_WIDTH 10
 
 static struct
 {
@@ -39,7 +39,8 @@ static struct
 } focus_indicator;
 
 static RrAppearance *a_focus_indicator;
-static RrColor      *color_white;
+static RrColor      *temporary_indicator_border_color;
+static RrColor      *temporary_indicator_fill_color;
 static gboolean      visible;
 
 static Window create_window(Window parent, gulong mask,
@@ -92,29 +93,30 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     window_add(&focus_indicator.bottom.window,
                INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
-    color_white = RrColorNew(ob_rr_inst, 0x00, 0x00, 0xff);
+    temporary_indicator_border_color = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
+    temporary_indicator_fill_color = RrColorNew(ob_rr_inst, 255, 99, 71);
+
 
     a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
     a_focus_indicator->surface.grad = RR_SURFACE_SOLID;
     a_focus_indicator->surface.relief = RR_RELIEF_FLAT;
-    a_focus_indicator->surface.primary = RrColorNew(ob_rr_inst,
-                                                    0xA6, 0xCA, 0xF4);
+    a_focus_indicator->surface.primary = temporary_indicator_fill_color;
     a_focus_indicator->texture[0].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[0].data.lineart.color = color_white;
+    a_focus_indicator->texture[0].data.lineart.color = temporary_indicator_border_color;
     a_focus_indicator->texture[1].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[1].data.lineart.color = color_white;
+    a_focus_indicator->texture[1].data.lineart.color = temporary_indicator_border_color;
     a_focus_indicator->texture[2].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[2].data.lineart.color = color_white;
+    a_focus_indicator->texture[2].data.lineart.color = temporary_indicator_border_color;
     a_focus_indicator->texture[3].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[3].data.lineart.color = color_white;
+    a_focus_indicator->texture[3].data.lineart.color = temporary_indicator_border_color;
 }
 
 void focus_cycle_indicator_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
 
-    RrColorFree(color_white);
-
+    RrColorFree(temporary_indicator_border_color);
+    RrColorFree(temporary_indicator_fill_color);
     RrAppearanceFree(a_focus_indicator);
 
     window_remove(focus_indicator.top.window);
