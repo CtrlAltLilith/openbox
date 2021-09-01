@@ -70,7 +70,7 @@ static gpointer setup_func(xmlNodePtr node,
 
     o = g_slice_new0(Options);
     o->bar = TRUE;
-    o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
+    o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     o->interactive = TRUE;
     o->all_monitors = TRUE;
 

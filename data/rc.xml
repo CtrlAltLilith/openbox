@@ -68,7 +68,7 @@
   bottom="yes"
  --> 
   <cornerRadius>8</cornerRadius>
-
+  <windowListIconSize>42</windowListIconSize>
   <keepBorder>yes</keepBorder>
   <animateIconify>yes</animateIconify>
   <font place="ActiveWindow">
@@ -260,7 +260,8 @@
 
   <!-- Keybindings for window switching -->
   <keybind key="A-Tab">
-    <action name="NextWindow">
+  <action name="NextWindow">
+    <raise>yes</raise>
       <finalactions>
         <action name="Focus"/>
         <action name="Raise"/>

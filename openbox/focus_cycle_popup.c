@@ -41,7 +41,7 @@
 /* Space between the outer ring around the hilite box and the icon inside it */
 #define HILITE_MARGIN 1
 /* Total distance from the edge of the hilite box to the icon inside it */
-#define HILITE_OFFSET (HILITE_WIDTH + HILITE_MARGIN)
+#define HILITE_OFFSET 0
 /* Margin area around the outside of the dialog */
 #define OUTSIDE_BORDER 3
 /* Margin area around the text */
@@ -194,10 +194,10 @@ void focus_cycle_popup_startup(gboolean reconfig)
                     y >= HILITE_SIZE - HILITE_WIDTH)
                 {
                     /* the border of the target */
-                    a = 0x88;
+                    a = (0xaa, 0x00, 0x33);
                 } else {
                     /* the background of the target */
-                    a = 0x22;
+                    a = (0xaa, 0x00, 0x33);
                 }
 
                 p[o++] = color + (a << RrDefaultAlphaOffset);

@@ -93,8 +93,8 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     window_add(&focus_indicator.bottom.window,
                INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
-    temporary_indicator_border_color = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
-    temporary_indicator_fill_color = RrColorNew(ob_rr_inst, 255, 99, 71);
+    temporary_indicator_border_color = RrColorNew(ob_rr_inst, 0x44, 0x22, 0x11);
+    temporary_indicator_fill_color = RrColorNew(ob_rr_inst, 0xaa, 0x00, 0x33);
 
 
     a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
