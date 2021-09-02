@@ -1,3 +1,6 @@
+#ifndef _HOME_SITHIS_DOCUMENTS_LILITH_OPENBOX_GETTEXT_H
+#define _HOME_SITHIS_DOCUMENTS_LILITH_OPENBOX_GETTEXT_H
+
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    gettext.h for the Openbox window manager
@@ -89,3 +92,5 @@
 #define _(str) gettext(str)
 
 #endif /* _LIBGETTEXT_H */
+
+#endif
