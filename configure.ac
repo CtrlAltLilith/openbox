@@ -1,5 +1,5 @@
-AC_PREREQ([2.54])
-AC_INIT([openbox], [3.7-n], [http://bugzilla.icculus.org])
+AC_PREREQ([2.71])
+AC_INIT([openbox],[3.7-n],[http://bugzilla.icculus.org])
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
 AM_INIT_AUTOMAKE([foreign])
@@ -90,7 +90,7 @@ OB_COMPILER_FLAGS
 AC_C_CONST
 AC_C_INLINE
 
-AC_PROG_LIBTOOL
+LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
 LIBTOOL="$LIBTOOL --silent"
 
@@ -128,10 +128,8 @@ AC_SUBST(XML_CFLAGS)
 AC_SUBST(XML_LIBS)
 
 AC_ARG_ENABLE(startup-notification,
-  AC_HELP_STRING(
-    [--disable-startup-notification],
-    [disable the startup notification library. [default=enabled]]
-  ),
+  AS_HELP_STRING([--disable-startup-notification],[disable the startup notification library. [default=enabled]
+  ]),
   [enable_sn=$enableval],
   [enable_sn=yes]
 )
@@ -153,10 +151,8 @@ else
 fi
 
 AC_ARG_ENABLE(xcursor,
-  AC_HELP_STRING(
-    [--disable-xcursor],
-    [disable use of the X Cursor library. [default=enabled]]
-  ),
+  AS_HELP_STRING([--disable-xcursor],[disable use of the X Cursor library. [default=enabled]
+  ]),
   [enable_xcursor=$enableval],
   [enable_xcursor=yes]
 )
@@ -178,10 +174,8 @@ else
 fi
 
 AC_ARG_ENABLE(imlib2,
-  AC_HELP_STRING(
-    [--disable-imlib2],
-    [disable use of Imlib2 image library for loading icons. [default=enabled]]
-  ),
+  AS_HELP_STRING([--disable-imlib2],[disable use of Imlib2 image library for loading icons. [default=enabled]
+  ]),
   [enable_imlib2=$enableval],
   [enable_imlib2=yes]
 )
@@ -208,10 +202,8 @@ fi
 AM_CONDITIONAL(USE_IMLIB2, [test $imlib2_found = yes])
 
 AC_ARG_ENABLE(librsvg,
-  AC_HELP_STRING(
-    [--disable-librsvg],
-    [disable use of SVG image files for loading icons. [default=enabled]]
-  ),
+  AS_HELP_STRING([--disable-librsvg],[disable use of SVG image files for loading icons. [default=enabled]
+  ]),
   [enable_librsvg=$enableval],
   [enable_librsvg=yes]
 )

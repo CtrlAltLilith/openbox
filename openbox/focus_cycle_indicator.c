@@ -39,8 +39,7 @@ static struct
 } focus_indicator;
 
 static RrAppearance *a_focus_indicator;
-static RrColor      *temporary_indicator_border_color;
-static RrColor      *temporary_indicator_fill_color;
+static RrColor      *border_color;
 static gboolean      visible;
 
 static Window create_window(Window parent, gulong mask,
@@ -93,30 +92,27 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     window_add(&focus_indicator.bottom.window,
                INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
-    temporary_indicator_border_color = RrColorNew(ob_rr_inst, 0x44, 0x22, 0x11);
-    temporary_indicator_fill_color = RrColorNew(ob_rr_inst, 0xaa, 0x00, 0x33);
-
-
     a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
     a_focus_indicator->surface.grad = RR_SURFACE_SOLID;
     a_focus_indicator->surface.relief = RR_RELIEF_FLAT;
-    a_focus_indicator->surface.primary = temporary_indicator_fill_color;
+    a_focus_indicator->surface.primary = ob_rr_theme->focus_cycle_bg_color;
+    border_color = ob_rr_theme->focus_cycle_border_color;
     a_focus_indicator->texture[0].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[0].data.lineart.color = temporary_indicator_border_color;
+    a_focus_indicator->texture[0].data.lineart.color = border_color;
     a_focus_indicator->texture[1].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[1].data.lineart.color = temporary_indicator_border_color;
+    a_focus_indicator->texture[1].data.lineart.color = border_color;
     a_focus_indicator->texture[2].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[2].data.lineart.color = temporary_indicator_border_color;
+    a_focus_indicator->texture[2].data.lineart.color = border_color;
     a_focus_indicator->texture[3].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[3].data.lineart.color = temporary_indicator_border_color;
+    a_focus_indicator->texture[3].data.lineart.color = border_color;
 }
 
 void focus_cycle_indicator_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
 
-    RrColorFree(temporary_indicator_border_color);
-    RrColorFree(temporary_indicator_fill_color);
+    RrColorFree(border_color);
+
     RrAppearanceFree(a_focus_indicator);
 
     window_remove(focus_indicator.top.window);
@@ -206,6 +202,16 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         XMoveResizeWindow(obt_display, focus_indicator.left.window,
                           x, y, w, h);
+                                  a_focus_indicator->surface.primary = ob_rr_theme->focus_cycle_bg_color;
+
+        border_color = ob_rr_theme->focus_cycle_border_color;
+
+        a_focus_indicator->texture[0].data.lineart.color = border_color;
+        a_focus_indicator->texture[1].data.lineart.color = border_color;
+        a_focus_indicator->texture[2].data.lineart.color = border_color;
+        a_focus_indicator->texture[3].data.lineart.color = border_color;
+
+
         a_focus_indicator->texture[0].data.lineart.x1 = w;
         a_focus_indicator->texture[0].data.lineart.y1 = 0;
         a_focus_indicator->texture[0].data.lineart.x2 = 0;

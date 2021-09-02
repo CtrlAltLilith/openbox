@@ -26,6 +26,10 @@ border.width: 4
 window.active.border.color: #f9f9f9
 window.inactive.border.color: #f9f9f9
 
+## Focus Cycle
+focus.cycle.bg.color: #f9f9f9
+focus.cycle.border.color: #f9f9f9
+
 ## Handle
 window.handle.width: 1
 window.active.handle.bg: flat

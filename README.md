@@ -1,6 +1,7 @@
 # Fork Features
 ![Screenshot](info/screenshot.png)
 
+* make focus cycle themeable by stfnwp 
 * Default horzontal alt tab with reduced hilite
 * More visible focus cycle indicator patch by [joaotavora](https://github.com/joaotavora/openbox/commit/55a73d9901fbac01268684fa352502ef65b59699)
 * Removed default themes and replaced with Joy and Box by [owl4ce](https://github.com/owl4ce/yao)
@@ -50,11 +51,13 @@ another monitor.
 current monitor. This may need more extensive testing to make sure it
 doesn't miss any movement methods. ~ Yut23 commit
 ## Bug fixes
+* g_memdup -> g_memdup2 deprication fix
 * Compiler deprication warning fixes (yut23)
 * 2018 Debian fixes by photon
 * Fix: bug #6362: desktop window may be set to skip the taskbar - they usually are (paulie-g)
 * Fix loosing focus while moving windows (Andrey Dotsenko)
-
+## Developer Features
+* VS Code task
 # Openbox
 
 Copyright (C) 2004  Mikael Magnusson

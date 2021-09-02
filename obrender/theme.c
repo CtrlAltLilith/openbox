@@ -439,7 +439,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("osd.button.focused.box.color",
                theme->osd_focused_lineart,
                RrColorCopy(theme->titlebut_focused_hover_color));
-
+    READ_COLOR("focus.cycle.bg.color",
+               theme->focus_cycle_bg_color,
+               RrColorNew(inst, 0, 0, 0));
+    READ_COLOR("focus.cycle.border.color",
+               theme->focus_cycle_border_color,
+               RrColorNew(inst, 0xFF, 0xFF, 0xFF));
     /* load window buttons */
 
     /* bases: unpressed, pressed, disabled */
@@ -1064,6 +1069,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->osd_focused_lineart);
         RrColorFree(theme->menu_title_shadow_color);
         RrColorFree(theme->menu_text_shadow_color);
+        RrColorFree(theme->focus_cycle_bg_color);
+        RrColorFree(theme->focus_cycle_border_color);
 
         g_free(theme->def_win_icon);
 
@@ -1446,7 +1453,7 @@ static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
     RrPixel32 *im, *p;
     gint i;
 
-    p = im = g_memdup(data, width * height * sizeof(RrPixel32));
+    p = im = g_memdup2(data, width * height * sizeof(RrPixel32));
 
     for (i = 0; i < width * height; ++i) {
         guchar a = ((*p >> 24) & 0xff);
