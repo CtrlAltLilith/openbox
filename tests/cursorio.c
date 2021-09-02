@@ -39,7 +39,7 @@ int main () {
 		      x, y, w, h, b, CopyFromParent, CopyFromParent,
 		      CopyFromParent, 0, NULL);
 
-  a.cursor = XCreateFontCursor(display, XC_watch); 
+  a.cursor = XCreateFontCursor(display, XC_watch);
   child = XCreateWindow(display, win,
                         x+w/8, y+h/8, 3*w/4, 3*h/4, 0,
                         CopyFromParent, InputOnly,

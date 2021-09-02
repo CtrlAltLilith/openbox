@@ -1,4 +1,4 @@
-# Fork Features 
+# Fork Features
 ![Screenshot](info/screenshot.png)
 
 * Default horzontal alt tab with reduced hilite
@@ -8,7 +8,7 @@
 
 >Simply add a lexecute attribute to any tag in your menu.xml file that usually has a label tag. The value of the lexecute attribute should be a shell command or location of a script file (just like pipe menus), the results of which will take the place of the tag's original label.
 
-* rounded corners with configurable bottom. (JJMorton) `<cornerRadius>8</cornerRadius>` 
+* rounded corners with configurable bottom. (JJMorton) `<cornerRadius>8</cornerRadius>`
 
 
 Argument description | Example
@@ -16,12 +16,12 @@ Argument description | Example
 Enable rounded corners on menus | menu="yes"
 Enable rounded corners on window bottom | bottom="yes"
 
-* Stop Hidden (Vitaly Minko) 
+* Stop Hidden (Vitaly Minko)
 `
   <application class="Firefox">
     <stop_hidden>group</stop_hidden>
   </application>
-` 
+`
 
 Value description | Example
 ------------ | -------------
@@ -30,7 +30,7 @@ stop just the process the hidden window belongs to | process
 Stops the entire process group including processes spawned by it | group
 
 
-* HJKL motion keys (mstuehn) 
+* HJKL motion keys (mstuehn)
 * Allow changing debug mode on the fly on a running wm (paulie-g)
 * Window snapping (emilypeto)
 * Cycle through the windows with the arrow keys (M374LX)

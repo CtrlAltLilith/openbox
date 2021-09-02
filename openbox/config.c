@@ -1001,9 +1001,9 @@ static void parse_menu(xmlNodePtr node, gpointer d)
         config_submenu_hide_delay = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "manageDesktops")))
         config_menu_manage_desktops = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "utf8Enabled"))) 
+    if ((n = obt_xml_find_node(node, "utf8Enabled")))
         config_menu_utf8_enabled = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "utf8AllowGraph"))) 
+    if ((n = obt_xml_find_node(node, "utf8AllowGraph")))
         config_menu_utf8_allow_graph = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "showIcons"))) {
         config_menu_show_icons = obt_xml_node_bool(n);

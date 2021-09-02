@@ -475,11 +475,11 @@ data/autostart/openbox-autostart: $(top_srcdir)/data/autostart/openbox-autostart
 
 %.desktop: %.desktop.in Makefile
 	@echo make: creating $@
-	@$(edit) $< >$@	
+	@$(edit) $< >$@
 
 %-session: %-session.in Makefile
 	@echo make: creating $@
-	@$(edit) $< >$@	
+	@$(edit) $< >$@
 
 %.1.in: %.1.sgml
 	@echo make: creating $@
@@ -487,7 +487,7 @@ data/autostart/openbox-autostart: $(top_srcdir)/data/autostart/openbox-autostart
 
 %.1: %.1.in Makefile
 	@echo make: creating $@
-	@$(edit) $< >$@	
+	@$(edit) $< >$@
 
 dist_gnomewmfiles_DATA = \
 	data/gnome-wm-properties/openbox.desktop

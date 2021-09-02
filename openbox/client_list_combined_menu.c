@@ -55,7 +55,7 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         gboolean empty = TRUE;
         gboolean onlyiconic = TRUE;
         gboolean noicons = TRUE;
-        
+
         desktop = desktop_it;
         if (desktop == 0)
             desktop = screen_desktop;

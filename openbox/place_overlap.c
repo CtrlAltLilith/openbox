@@ -193,7 +193,7 @@ static int find_first_grid_position_greater_or_equal(int search_value,
     g_assert(BSEARCH_FOUND_NEAREST_SMALLER());
     /* Get the nearest larger instead. */
     return BSEARCH_AT() + 1;
-}                         
+}
 
 static void expand_width(Rect* r, int by)
 {

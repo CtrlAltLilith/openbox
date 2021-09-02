@@ -36,7 +36,7 @@ typedef struct _GravityPoint {
 
 #define GRAVITY_COORD_SET(c, p, cen, opp) \
     (c).pos = (p), (c).center = (cen), (c).opposite = (opp)
-  
+
 
 typedef struct _Point {
     int x;

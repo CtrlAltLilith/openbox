@@ -56,7 +56,7 @@ obt/obt-3.5.pc
 tools/gnome-panel-control/gnome-panel-control
 tools/gdm-control/gdm-control
 tools/obxprop/obxprop
-tools/themeupdate/themeupdate.py 
+tools/themeupdate/themeupdate.py
 version.h
 .libs
 .deps

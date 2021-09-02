@@ -142,7 +142,7 @@ struct _ObSubmenuMenuEntry {
 
     gchar *name;
     ObMenu *submenu;
-    
+
     guint show_from;
 };
 
@@ -157,7 +157,7 @@ struct _ObMenuEntry
     ObMenu *menu;
 
     gint id;
-    
+
     ObLabel *label;
 
 

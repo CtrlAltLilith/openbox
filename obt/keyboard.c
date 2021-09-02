@@ -164,7 +164,7 @@ void xim_init(void)
 
             /* find a style that doesnt need preedit or status */
             for (i = 0; i < xim_styles->count_styles; ++i) {
-                if (xim_styles->supported_styles[i] == 
+                if (xim_styles->supported_styles[i] ==
                     (XIMPreeditNothing | XIMStatusNothing))
                 {
                     xim_style = xim_styles->supported_styles[i];

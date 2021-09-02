@@ -65,9 +65,9 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
-static void read_button_styles(XrmDatabase db, const RrInstance *inst, 
+static void read_button_styles(XrmDatabase db, const RrInstance *inst,
                                gchar *path,
-                               const RrTheme *theme, RrButton *btn, 
+                               const RrTheme *theme, RrButton *btn,
                                const gchar *btnname,
                                struct fallbacks *fbs,
                                guchar *normal_mask,
@@ -304,7 +304,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                theme->menu_border_color,
                RrColorCopy(theme->frame_focused_border_color));
 
-    READ_COLOR("osd.border.color", 
+    READ_COLOR("osd.border.color",
                theme->osd_border_color,
                RrColorCopy(theme->frame_focused_border_color));
 
@@ -403,7 +403,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("menu.bullet.image.color",
                theme->menu_bullet_color,
                RrColorCopy(theme->menu_color));
-   
+
     READ_COLOR("menu.items.disabled.text.color",
                theme->menu_disabled_color,
                RrColorNew(inst, 0, 0, 0));
@@ -419,8 +419,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("menu.separator.color",
                theme->menu_sep_color,
                RrColorCopy(theme->menu_color));
-    
-    READ_COLOR("menu.bullet.selected.image.color", 
+
+    READ_COLOR("menu.bullet.selected.image.color",
                theme->menu_bullet_selected_color,
                RrColorCopy(theme->menu_selected_color));
 
@@ -439,7 +439,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("osd.button.focused.box.color",
                theme->osd_focused_lineart,
                RrColorCopy(theme->titlebut_focused_hover_color));
- 
+
     /* load window buttons */
 
     /* bases: unpressed, pressed, disabled */
@@ -1066,7 +1066,7 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_text_shadow_color);
 
         g_free(theme->def_win_icon);
-        
+
         RrPixmapMaskFree(theme->menu_bullet_mask);
         RrPixmapMaskFree(theme->down_arrow_mask);
         RrPixmapMaskFree(theme->up_arrow_mask);
@@ -1464,9 +1464,9 @@ static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
     return im;
 }
 
-static void read_button_styles(XrmDatabase db, const RrInstance *inst, 
+static void read_button_styles(XrmDatabase db, const RrInstance *inst,
                                gchar *path,
-                               const RrTheme *theme, RrButton *btn, 
+                               const RrTheme *theme, RrButton *btn,
                                const gchar *btnname,
                                struct fallbacks *fbs,
                                guchar *normal_mask,

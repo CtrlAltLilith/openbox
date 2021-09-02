@@ -165,7 +165,7 @@ gint main(gint argc, gchar **argv)
     if (chdir(g_get_home_dir()) == -1)
         g_message(_("Unable to change to home directory \"%s\": %s"),
                   g_get_home_dir(), g_strerror(errno));
-    
+
     /* parse the command line args, which can change the argv[0] */
     parse_args(&argc, argv);
     /* parse the environment variables */
@@ -189,7 +189,7 @@ gint main(gint argc, gchar **argv)
         */
 
         if(remote_control_cmd & OB_REMOTECTRL_CMD_DEBUGMOD)
-            remote_control_cmd |= ob_debug_mode << OB_REMOTECTRL_CMD_BITLEN; // send debug mode as control data 
+            remote_control_cmd |= ob_debug_mode << OB_REMOTECTRL_CMD_BITLEN; // send debug mode as control data
 
 
         OBT_PROP_MSG(ob_screen, obt_root(ob_screen),

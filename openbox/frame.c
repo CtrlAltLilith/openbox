@@ -933,7 +933,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         XResizeWindow(obt_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
                       	self->need_render = TRUE;
-    }    
+    }
     framerender_frame(self);
 }
 

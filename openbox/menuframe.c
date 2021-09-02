@@ -765,7 +765,7 @@ void menu_frame_render(ObMenuFrame *self)
                    ob_rr_theme->a_menu_text_disabled) :
                   /* enabled */
                   (e == self->selected ?
-                   ob_rr_theme->a_menu_text_selected : 
+                   ob_rr_theme->a_menu_text_selected :
                    ob_rr_theme->a_menu_text_normal));
         switch (e->entry->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:

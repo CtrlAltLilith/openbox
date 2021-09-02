@@ -610,19 +610,19 @@
     - window.active.button.toggled.image.color has been split into:
       - window.active.button.toggled.unpressed.image.color
       - window.active.button.toggled.pressed.image.color
-      - window.active.button.toggled.hover.image.color 
+      - window.active.button.toggled.hover.image.color
     - window.inactive.button.toggled.image.color has been split into:
       - window.inactive.button.toggled.unpressed.image.color
       - window.inactive.button.toggled.pressed.image.color
-      - window.inactive.button.toggled.hover.image.color 
+      - window.inactive.button.toggled.hover.image.color
     - window.active.button.toggled.bg has been split into:
       - window.active.button.toggled.unpressed.bg
       - window.active.button.toggled.pressed.bg
-      - window.active.button.toggled.hover.bg 
+      - window.active.button.toggled.hover.bg
     - window.inactive.button.toggled.bg has been split into:
       - window.inactive.button.toggled.unpressed.bg
       - window.inactive.button.toggled.pressed.bg
-      - window.inactive.button.toggled.hover.bg 
+      - window.inactive.button.toggled.hover.bg
   * Add new Onyx and Onyx-Citrus themes
   * Updated Mikachu theme using new theme options
   * Improvements to splitvertical gradients - Add a small gradient in the

@@ -51,7 +51,7 @@ AC_DEFUN([OB_DEBUG],
 	MSG="$MSG with super warnings"
     fi
     AC_MSG_RESULT([$MSG])
-    
+
     test "$DEBUG" = "yes" && \
 	AC_DEFINE([DEBUG], [1], [Creating a debug build])
 ])

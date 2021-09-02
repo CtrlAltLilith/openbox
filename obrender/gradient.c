@@ -246,8 +246,8 @@ static inline void repeat_pixel(RrPixel32 *start, gint w)
            getting by doing this (splitvertical3 switches from doing
            "*(data++) = color" n times to doing this memcpy thing log n times:
 
-           %   cumulative   self              self     total           
-           time   seconds   seconds    calls  ms/call  ms/call  name    
+           %   cumulative   self              self     total
+           time   seconds   seconds    calls  ms/call  ms/call  name
            49.44      0.88     0.88     1063     0.83     0.83  splitvertical1
            47.19      1.72     0.84     1063     0.79     0.79  splitvertical2
             2.81      1.77     0.05     1063     0.05     0.05  splitvertical3
@@ -826,7 +826,7 @@ static void gradient_pyramid(RrSurface *sf, gint w, gint h)
        this is the opposite, moving the read pointer forward and the write
        pointer backward
        42.27      4.40     1.86      504     3.69     3.69  gradient_pyramid2
-       
+
     */
     ldata = sf->pixel_data + (halfh - 1) * w;
     cp = ldata + (midy + 1) * w;

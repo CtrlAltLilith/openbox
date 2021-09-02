@@ -33,7 +33,7 @@ void unittest_end_suite()
     g_active_test_suite = NULL;
 }
 
-void unittest_start(const char* test_name) 
+void unittest_start(const char* test_name)
 {
     g_test_failures_at_test_start = g_test_failures;
     g_assert(g_active_test_name == NULL);

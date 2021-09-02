@@ -62,11 +62,11 @@
       D: omnipresent (on all desktops).
   -->
   <!-- Round Corners
-  
-  Other options: 
+
+  Other options:
   menu="yes"
   bottom="yes"
- --> 
+ -->
   <cornerRadius>8</cornerRadius>
   <windowListIconSize>42</windowListIconSize>
   <keepBorder>yes</keepBorder>
@@ -359,7 +359,7 @@
     </mousebind>
     <mousebind button="A-Right" action="Drag">
       <action name="Resize"/>
-    </mousebind> 
+    </mousebind>
 
     <mousebind button="A-Middle" action="Press">
       <action name="Lower"/>
@@ -611,7 +611,7 @@
     <!-- Menus -->
     <mousebind button="Middle" action="Press">
       <action name="ShowMenu"><menu>client-list-combined-menu</menu></action>
-    </mousebind> 
+    </mousebind>
     <mousebind button="Right" action="Press">
       <action name="ShowMenu"><menu>root-menu</menu></action>
     </mousebind>
@@ -699,7 +699,7 @@
   # order that they appear in this list
 
 
-    # each rule element can be left out or set to 'default' to specify to not 
+    # each rule element can be left out or set to 'default' to specify to not
     # change that attribute of the window
 
     <decor>yes</decor>

@@ -1,7 +1,7 @@
 EWMH Compliance Document:
 ==========================
 
-Listed below are all the NetWM (or EWM) hints decided upon on freedesktop.org 
+Listed below are all the NetWM (or EWM) hints decided upon on freedesktop.org
 and Openbox's current level of compliance with the spec. Beside each hint is
 the version of the spec which Openbox is compliant up to for the hint.
 

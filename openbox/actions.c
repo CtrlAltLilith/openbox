@@ -255,7 +255,7 @@ ObActionsAct* actions_parse_string(const gchar *name)
                 act->options = act->def->setup.n(NULL);
         }
     }
-                
+
 
     return act;
 }

@@ -222,7 +222,7 @@ struct _RrTexture {
 
 struct _RrAppearance {
     const RrInstance *inst;
-    
+
     RrSurface surface;
     gint textures;
     RrTexture *texture;
@@ -305,7 +305,7 @@ struct _RrButton {
     RrColor *unfocused_pressed_toggled_color;
     RrColor *focused_unpressed_toggled_color;
     RrColor *unfocused_unpressed_toggled_color;
-    
+
     /* masks */
     RrPixmapMask *unpressed_mask;
     RrPixmapMask *pressed_mask;
@@ -314,7 +314,7 @@ struct _RrButton {
     RrPixmapMask *unpressed_toggled_mask;
     RrPixmapMask *hover_toggled_mask;
     RrPixmapMask *pressed_toggled_mask;
-   
+
     /* textures */
     RrAppearance *a_focused_unpressed;
     RrAppearance *a_unfocused_unpressed;

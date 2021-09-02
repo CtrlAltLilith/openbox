@@ -599,7 +599,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_arrow->surface.parent = p->a_bg;
         p->a_arrow->surface.parentx = up_arrow_x;
         p->a_arrow->surface.parenty = up_arrow_y;
-        RrPaint(p->a_arrow, p->list_mode_up, 
+        RrPaint(p->a_arrow, p->list_mode_up,
                 ob_rr_theme->up_arrow_mask->width,
                 ob_rr_theme->up_arrow_mask->height);
 
@@ -608,7 +608,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_arrow->surface.parent = p->a_bg;
         p->a_arrow->surface.parentx = down_arrow_x;
         p->a_arrow->surface.parenty = down_arrow_y;
-        RrPaint(p->a_arrow, p->list_mode_down, 
+        RrPaint(p->a_arrow, p->list_mode_down,
                 ob_rr_theme->down_arrow_mask->width,
                 ob_rr_theme->down_arrow_mask->height);
     }

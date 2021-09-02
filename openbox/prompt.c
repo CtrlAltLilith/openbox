@@ -58,7 +58,7 @@ void prompt_startup(gboolean reconfig)
 
     prompt_a_button = RrAppearanceCopy(ob_rr_theme->osd_unpressed_button);
     prompt_a_focus = RrAppearanceCopy(ob_rr_theme->osd_focused_button);
-    prompt_a_press = RrAppearanceCopy(ob_rr_theme->osd_pressed_button);    
+    prompt_a_press = RrAppearanceCopy(ob_rr_theme->osd_pressed_button);
 
     prompt_a_msg = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     prompt_a_msg->texture[0].data.text.flow = TRUE;

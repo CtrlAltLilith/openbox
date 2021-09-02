@@ -212,7 +212,7 @@ static gboolean i_input_func(guint initial_state,
             o->state = e->xkey.state;
             return FALSE;
         }
-        
+
         /* Cycle through the windows with the arrow keys */
         else if (sym == XK_Down || sym == XK_Right) {
             gboolean forward = o->forward;

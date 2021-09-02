@@ -71,7 +71,7 @@ static inline void grow(void) {
     if (qnum == qsz) {
         const gulong newsz = qsz*2;
         gulong i;
- 
+
         q = g_renew(XEvent, q, newsz);
 
         g_assert(qnum > 0);
@@ -314,7 +314,7 @@ gboolean xqueue_remove_local(XEvent *event_return,
 gboolean xqueue_pending_local(void)
 {
     g_return_val_if_fail(q != NULL, FALSE);
-    
+
     if (!qnum) read_events(FALSE);
     return qnum != 0;
 }

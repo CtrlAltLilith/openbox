@@ -212,7 +212,7 @@ static gboolean is_valid_shortcut(gchar *c)
     uc = g_utf8_get_char_validated(c, MAX(OB_MAX_UTF8_CHAR_SZ, strlen(c)));
     g_assert(uc > ((gunichar) - 1));
 
-    return config_menu_utf8_allow_graph ? g_unichar_isgraph(uc) : g_unichar_isalnum(uc); 
+    return config_menu_utf8_allow_graph ? g_unichar_isgraph(uc) : g_unichar_isalnum(uc);
 }
 
 static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
@@ -322,7 +322,7 @@ static void parse_menu_item(xmlNodePtr node, gpointer data)
                 c = obt_xml_find_node(c->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, lexecute, acts, TRUE);
-            
+
             if (config_menu_show_icons &&
                 obt_xml_attr_string(node, "icon", &icon))
             {
@@ -795,7 +795,7 @@ void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
 
 
     switch (self->type) {
- 
+
     case OB_MENU_ENTRY_TYPE_NORMAL:
         g_free(self->data.normal.collate_key);
         self->data.normal.shortcut =

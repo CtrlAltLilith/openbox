@@ -145,7 +145,7 @@ static inline void log_argv(ObDebugType type,
     gchar *message;
 
     if (! (ob_debug_mode & type)) return;
-    
+
     if(!log_file)
         ob_debug_startup();
 
