@@ -35,7 +35,7 @@
    USA.  */
 
 #ifndef _LIBGETTEXT_H
-#define _LIBGETTEXT_H 1
+#define LIBGETTEXT_H 1
 
 
 /* NLS can be disabled through the configure --disable-nls option.  */
