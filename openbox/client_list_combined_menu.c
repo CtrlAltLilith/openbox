@@ -62,7 +62,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         else if (desktop <= screen_desktop)
             desktop -= 1;
 
-    menu_add_separator(menu, SEPARATOR, screen_desktop_names[desktop], NULL);        for (it = focus_order; it; it = g_list_next(it)) {
+        menu_add_separator(menu, SEPARATOR, screen_desktop_names[desktop]);
+        for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (focus_valid_target(c, desktop, 0,
                                    TRUE, TRUE,
@@ -72,13 +73,13 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 
                 if (c->iconic) {
                     if (noicons) {
-                        menu_add_separator(menu, -1, NULL, NULL);
+                        menu_add_separator(menu, -1, NULL);
                         noicons = FALSE;
                     }
-                    e = menu_add_normal(menu, desktop, c->icon_title, NULL, NULL, FALSE);
+                    e = menu_add_normal(menu, desktop, c->icon_title, NULL, FALSE);
                 } else {
                     onlyiconic = FALSE;
-                    e = menu_add_normal(menu, desktop, c->title, NULL, NULL, FALSE);
+                    e = menu_add_normal(menu, desktop, c->title, NULL, FALSE);
                 }
 
                 if (config_menu_show_icons) {
@@ -96,19 +97,19 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
             /* no entries or only iconified windows, so add a
              * way to go to this desktop without uniconifying a window */
             if (!empty)
-                menu_add_separator(menu, SEPARATOR, NULL, NULL);
-            e = menu_add_normal(menu, desktop, _("Go there..."), NULL, NULL, TRUE);
+                menu_add_separator(menu, SEPARATOR, NULL);
+
+            e = menu_add_normal(menu, desktop, _("Go there..."), NULL, TRUE);
             if (desktop == screen_desktop)
                 e->data.normal.enabled = FALSE;
         }
     }
 
     if (config_menu_manage_desktops) {
-        menu_add_separator(menu, SEPARATOR, _("Manage desktops"), NULL);
-        menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, NULL,
-                        TRUE);
+        menu_add_separator(menu, SEPARATOR, _("Manage desktops"));
+        menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
         menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
-                        NULL, NULL, TRUE);
+                        NULL, TRUE);
     }
 
     return TRUE; /* always show the menu */
@@ -162,7 +163,7 @@ void client_list_combined_menu_startup(gboolean reconfig)
     if (!reconfig)
         client_add_destroy_notify(client_dest, NULL);
 
-    combined_menu = menu_new(MENU_NAME, _("Windows"), NULL, TRUE, NULL);
+    combined_menu = menu_new(MENU_NAME, _("Windows"), TRUE, NULL);
     menu_set_update_func(combined_menu, self_update);
     menu_set_cleanup_func(combined_menu, self_cleanup);
     menu_set_execute_func(combined_menu, menu_execute);

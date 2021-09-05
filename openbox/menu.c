@@ -300,8 +300,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
 static void parse_menu_item(xmlNodePtr node, gpointer data)
 {
     ObMenuParseState *state = data;
-    gchar *label = NULL;
-    gchar *lexecute = NULL;
+    gchar *label;
     gchar *icon;
     ObMenuEntry *e;
 
@@ -309,9 +308,8 @@ static void parse_menu_item(xmlNodePtr node, gpointer data)
         /* Don't try to extract "icon" attribute if icons in user-defined
            menus are not enabled. */
 
-        obt_xml_attr_string_unstripped(node, "label", &label);
-        obt_xml_attr_string_unstripped(node, "lexecute", &lexecute);
-        if (label || lexecute) {            xmlNodePtr c;
+        if (obt_xml_attr_string_unstripped(node, "label", &label)) {
+            xmlNodePtr c;
             GSList *acts = NULL;
 
             c = obt_xml_find_node(node->children, "action");
@@ -321,8 +319,8 @@ static void parse_menu_item(xmlNodePtr node, gpointer data)
                     acts = g_slist_append(acts, action);
                 c = obt_xml_find_node(c->next, "action");
             }
-            e = menu_add_normal(state->parent, -1, label, lexecute, acts, TRUE);
-
+            e = menu_add_normal(state->parent, -1, label, acts, TRUE);
+            
             if (config_menu_show_icons &&
                 obt_xml_attr_string(node, "icon", &icon))
             {
@@ -333,9 +331,8 @@ static void parse_menu_item(xmlNodePtr node, gpointer data)
 
                 g_free(icon);
             }
-       g_free(label);
-        g_free(lexecute);
-                }
+            g_free(label);
+        }
     }
 }
 
@@ -345,25 +342,19 @@ static void parse_menu_separator(xmlNodePtr node, gpointer data)
 
     if (state->parent) {
         gchar *label;
-        gchar *lexecute;
-
 
         if (!obt_xml_attr_string_unstripped(node, "label", &label))
             label = NULL;
 
-if (!obt_xml_attr_string_unstripped(node, "lexecute", &lexecute))
-            lexecute = NULL;
-        menu_add_separator(state->parent, -1, label, lexecute);
-                g_free(label);
-                g_free(lexecute);
-
+        menu_add_separator(state->parent, -1, label);
+        g_free(label);
     }
 }
 
 static void parse_menu(xmlNodePtr node, gpointer data)
 {
     ObMenuParseState *state = data;
-    gchar *name = NULL, *label = NULL, *lexecute = NULL, *script = NULL;
+    gchar *name = NULL, *title = NULL, *script = NULL;
     ObMenu *menu;
     ObMenuEntry *e;
     gchar *icon;
@@ -372,14 +363,11 @@ static void parse_menu(xmlNodePtr node, gpointer data)
         goto parse_menu_fail;
 
     if (!g_hash_table_lookup(menu_hash, name)) {
-        obt_xml_attr_string_unstripped(node, "label", &label);
-        obt_xml_attr_string_unstripped(node, "lexecute", &lexecute);
+        if (!obt_xml_attr_string_unstripped(node, "label", &title))
+            goto parse_menu_fail;
 
-        if (label == NULL && lexecute == NULL)
-                    goto parse_menu_fail;
-
-        if ((menu = menu_new(name, label, lexecute, TRUE, NULL))) {
-                menu->pipe_creator = state->pipe_creator;
+        if ((menu = menu_new(name, title, TRUE, NULL))) {
+            menu->pipe_creator = state->pipe_creator;
             if (obt_xml_attr_string(node, "execute", &script)) {
                 menu->execute = obt_paths_expand_tilde(script);
             } else {
@@ -410,26 +398,24 @@ static void parse_menu(xmlNodePtr node, gpointer data)
 
 parse_menu_fail:
     g_free(name);
-    g_free(label);
-    g_free(lexecute);
+    g_free(title);
     g_free(script);
 }
 
-ObMenu* menu_new(const gchar *name, const gchar *label, const gchar* lexecute,
+ObMenu* menu_new(const gchar *name, const gchar *title,
                  gboolean allow_shortcut_selection, gpointer data)
 {
     ObMenu *self;
 
     self = g_slice_new0(ObMenu);
-    self->label = g_slice_new0(ObLabel);
     self->name = g_strdup(name);
     self->data = data;
 
-     self->shortcut = parse_shortcut(label, allow_shortcut_selection,
-                                    &self->label->text, &self->shortcut_position,
+    self->shortcut = parse_shortcut(title, allow_shortcut_selection,
+                                    &self->title, &self->shortcut_position,
                                     &self->shortcut_always_show);
-self->collate_key = g_utf8_collate_key(self->label->text, -1);
-    self->label->lexecute = g_strdup(lexecute);
+    self->collate_key = g_utf8_collate_key(self->title, -1);
+
     g_hash_table_replace(menu_hash, self->name, self);
 
     /* Each menu has a single more_menu.  When the menu spills past what
@@ -442,10 +428,8 @@ self->collate_key = g_utf8_collate_key(self->label->text, -1);
        more_menu->more_menu will always be NULL, since there is only 1 for
        each menu. */
     self->more_menu = g_slice_new0(ObMenu);
-        self->more_menu->label = g_slice_new0(ObLabel);
-
     self->more_menu->name = _("More...");
-self->more_menu->label->text = _("More...");
+    self->more_menu->title = _("More...");
     self->more_menu->collate_key = "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
     self->more_menu->data = data;
     self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
@@ -472,23 +456,9 @@ static void menu_destroy_hash_value(ObMenu *self)
 
     menu_clear_entries(self);
     g_free(self->name);
+    g_free(self->title);
     g_free(self->collate_key);
     g_free(self->execute);
-       if (self->label) {
-        g_free(self->label->text);
-        g_free(self->label->lexecute);
-    }
-    g_slice_free(ObLabel, self->label);
-
-
-    // Why does this code crash the program?
-    /*
-    if (self->more_menu && self->more_menu->label) {
-        g_free(self->more_menu->label->text);
-        g_free(self->more_menu->label->lexecute);
-        g_slice_free(ObLabel, self->more_menu->label);
-    }
-    */
     g_slice_free(ObMenu, self->more_menu);
 
     g_slice_free(ObMenu, self);
@@ -581,12 +551,11 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 
     g_assert(menu);
 
-    self = g_new0(ObMenuEntry, 1);
+    self = g_slice_new0(ObMenuEntry);
     self->ref = 1;
     self->type = type;
     self->menu = menu;
     self->id = id;
-    self->label = g_new0(ObLabel, 1);
 
     switch (type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
@@ -608,15 +577,10 @@ void menu_entry_ref(ObMenuEntry *self)
 void menu_entry_unref(ObMenuEntry *self)
 {
     if (self && --self->ref == 0) {
-           if (self->label) {
-            g_free(self->label->text);
-            g_free(self->label->lexecute);
-        }
-        g_free(self->label);
-
         switch (self->type) {
         case OB_MENU_ENTRY_TYPE_NORMAL:
             RrImageUnref(self->data.normal.icon);
+            g_free(self->data.normal.label);
             g_free(self->data.normal.collate_key);
             while (self->data.normal.actions) {
                 actions_act_unref(self->data.normal.actions->data);
@@ -630,6 +594,7 @@ void menu_entry_unref(ObMenuEntry *self)
             g_free(self->data.submenu.name);
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
+            g_free(self->data.separator.label);
             break;
         }
 
@@ -666,7 +631,6 @@ void menu_entry_remove(ObMenuEntry *self)
 }
 
 ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
-                             const gchar* lexecute,
                              GSList *actions, gboolean allow_shortcut)
 {
     ObMenuEntry *e;
@@ -674,7 +638,7 @@ ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL, id);
     e->data.normal.actions = actions;
 
-    menu_entry_set_label(e, label, lexecute, allow_shortcut);
+    menu_entry_set_label(e, label, allow_shortcut);
 
     self->entries = g_list_append(self->entries, e);
     self->more_menu->entries = self->entries; /* keep it in sync */
@@ -704,14 +668,13 @@ ObMenuEntry* menu_add_submenu(ObMenu *self, gint id, const gchar *submenu)
     return e;
 }
 
-ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label,
-                                const gchar *lexecute)
+ObMenuEntry* menu_add_separator(ObMenu *self, gint id, const gchar *label)
 {
     ObMenuEntry *e;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR, id);
 
-    menu_entry_set_label(e, label, lexecute, FALSE);
+    menu_entry_set_label(e, label, FALSE);
 
     self->entries = g_list_append(self->entries, e);
     self->more_menu->entries = self->entries; /* keep it in sync */
@@ -777,38 +740,29 @@ void menu_find_submenus(ObMenu *self)
     for (it = self->entries; it; it = g_list_next(it)) {
         ObMenuEntry *e = it->data;
 
-        if (e->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+        if (e->type == OB_MENU_ENTRY_TYPE_SUBMENU)
             e->data.submenu.submenu = menu_from_name(e->data.submenu.name);
-            menu_entry_set_label(e, e->data.submenu.submenu->label->text,
-                                 e->data.submenu.submenu->label->lexecute,
-                                 FALSE);
-        }
     }
 }
 
 void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
-                          const gchar *lexecute, gboolean allow_shortcut)
+                          gboolean allow_shortcut)
 {
-        g_free(self->label->text);
-    g_free(self->label->lexecute);
-    self->label->lexecute = g_strdup(lexecute);
-
-
     switch (self->type) {
-
+    case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        g_free(self->data.separator.label);
+        self->data.separator.label = g_strdup(label);
+        break;
     case OB_MENU_ENTRY_TYPE_NORMAL:
+        g_free(self->data.normal.label);
         g_free(self->data.normal.collate_key);
         self->data.normal.shortcut =
-            parse_shortcut(label, allow_shortcut, &self->label->text,
+            parse_shortcut(label, allow_shortcut, &self->data.normal.label,
                            &self->data.normal.shortcut_position,
                            &self->data.normal.shortcut_always_show);
         self->data.normal.collate_key =
-            g_utf8_collate_key(self->label->text, -1);
+            g_utf8_collate_key(self->data.normal.label, -1);
         break;
-    case OB_MENU_ENTRY_TYPE_SUBMENU:
-    case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        self->label->text = g_strdup(label);
-                break;
     default:
         g_assert_not_reached();
     }
@@ -883,40 +837,4 @@ void menu_sort_entries(ObMenu *self)
         last = it;
     }
     sort_range(self, start, last, len);
-}
-gboolean menu_entry_label_execute(ObMenuEntry *self)
-{
-    gchar *output;
-    GError *err = NULL;
-
-    if (!self->label->lexecute)
-        return FALSE;
-
-    if (!g_spawn_command_line_sync(self->label->lexecute,
-                                   &output, NULL, NULL, &err)) {
-        g_message(_("Failed to execute command \"%s\" for label \"%s\": %s"),
-                  self->label->lexecute,
-                  self->label->text, err->message);
-        g_error_free(err);
-        return FALSE;
-    }
-
-    /* strip the LF char from the end of the output string */
-    if (strlen(output))
-        output[strlen(output) - 1] = '\0';
-
-    g_free(self->label->text);
-    if (strlen(output))
-        self->label->text = g_strdup(output);
-    else
-        self->label->text = NULL;
-
-    if (self->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
-        g_free(self->data.submenu.submenu->label->text);
-        self->data.submenu.submenu->label->text = g_strdup(output);
-    }
-
-    g_free(output);
-
-    return TRUE;
 }
