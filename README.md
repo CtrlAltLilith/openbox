@@ -1,6 +1,6 @@
 # Fork Features
 ![Screenshot](info/screenshot.png)
-
+* Arch PKGBUILD
 * make focus cycle themeable by stfnwp 
 * Default horzontal alt tab with reduced hilite
 * More visible focus cycle indicator patch by [joaotavora](https://github.com/joaotavora/openbox/commit/55a73d9901fbac01268684fa352502ef65b59699)
