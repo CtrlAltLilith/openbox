@@ -1778,7 +1778,7 @@ static void client_setup_default_decor_and_functions(ObClient *self)
     self->decorations =
         (OB_FRAME_DECOR_TITLEBAR |
          OB_FRAME_DECOR_HANDLE |
-         OB_FRAME_DECOR_GRIPS |
+         OB_FRAME_DECOR_BORDER |
          OB_FRAME_DECOR_BORDER |
          OB_FRAME_DECOR_ICON |
          OB_FRAME_DECOR_ALLDESKTOPS |
@@ -1895,8 +1895,6 @@ static void client_setup_default_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_SHADE;
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY))
         self->decorations &= ~OB_FRAME_DECOR_ICONIFY;
-    if (!(self->functions & OB_CLIENT_FUNC_RESIZE))
-        self->decorations &= ~(OB_FRAME_DECOR_GRIPS | OB_FRAME_DECOR_HANDLE);
 
     /* can't maximize without moving/resizing */
     if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
@@ -1928,7 +1926,7 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
            the case any more though !
 
            but do kill the handle on fully maxed windows */
-        self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
+        self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_BORDER);
     }
 
     /* if we don't have a titlebar, then we cannot shade! */

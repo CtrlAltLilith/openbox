@@ -8,7 +8,7 @@
 # This script has been modified from the arch repos
 pkgname=openbox-lilith
 pkgver=3.70git
-pkgrel=1
+pkgrel=2
 pkgdesc='Openbox fork with major patches and default aesthetic changes'
 arch=('x86_64')
 url='https://github.com/CtrlAltLilith/openbox'

@@ -1,5 +1,6 @@
 # Fork Features
 ![Screenshot](info/screenshot.png)
+* Removed handle on window max
 * Arch PKGBUILD
 * make focus cycle themeable by stfnwp 
 * Default horzontal alt tab with reduced hilite
