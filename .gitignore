@@ -116,3 +116,4 @@ configure~
 pkg/openbox-lilith/*
 master.tar.gz
 openbox-lilith-3.70git-1-x86_64.pkg.tar.zst
+pkg/*

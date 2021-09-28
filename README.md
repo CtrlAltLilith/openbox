@@ -1,5 +1,6 @@
 # Fork Features
 ![Screenshot](info/screenshot.png)
+* Agressive default cflag optimizations
 * Removed handle on window max
 * Arch PKGBUILD
 * make focus cycle themeable by stfnwp 

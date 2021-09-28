@@ -14,7 +14,8 @@ rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/obrender
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 appsdir         = $(datadir)/applications
-
+CFLAGS=-frecord-gcc-switches -flto -fdevirtualize-at-ltrans -flto-partition=one -pipe -Ofast -march=native -mtune=native -fgraphite-identity -floop-nest-optimize -fno-semantic-interposition -ftree-vectorize -fvar-tracking-assignments -fno-semantic-interposition -ftree-slp-vectorize -fuse-linker-plugin -fuse-ld=gold
+LDFLAGS=${CFLAGS} -Wl,--hash-style=gnu,--as-needed,-O2,--sort-common,-z,relro,-z,now
 theme = Clearlooks
 
 AUTOMAKE_OPTIONS = subdir-objects foreign
@@ -192,7 +193,7 @@ openbox_openbox_LDADD = \
 	$(LIBINTL) \
 	obrender/libobrender.la \
 	obt/libobt.la
-openbox_openbox_LDFLAGS = -export-dynamic
+openbox_openbox_LDFLAGS =  ${CFLAGS} -Wl,--hash-style=gnu,--as-needed,-O2,--sort-common,-z,relro,-z,now
 openbox_openbox_SOURCES = \
 	gettext.h \
 	openbox/actions/all.c \
