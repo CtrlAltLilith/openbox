@@ -1,5 +1,6 @@
 # Fork Features
 ![Screenshot](info/screenshot.png)
+* PGO optimizations: Compile.sh generates pgo profile on first run, and switches to use if pgo profile exists.
 * Agressive default cflag optimizations
 * Removed handle on window max
 * Arch PKGBUILD
