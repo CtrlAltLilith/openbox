@@ -55,6 +55,7 @@ doesn't miss any movement methods. ~ Yut23 commit
 * 2018 Debian fixes by photon
 * Fix: bug #6362: desktop window may be set to skip the taskbar - they usually are (paulie-g)
 * Fix loosing focus while moving windows (Andrey Dotsenko)
+* When turning off maximize/fullscreen, keep window on same monitor. #39 (https://github.com/danakj/openbox/pull/39/commits/31e60d83326a756d5dc81d5fd6ce83e6e51c4792) By Corey W
 ## Developer Features
 * VS Code task
 # Openbox
